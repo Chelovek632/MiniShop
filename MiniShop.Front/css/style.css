@@ -1,0 +1,162 @@
+/* Кастомные стили для улучшения Bootstrap */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Улучшенные карточки товаров */
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.product-image {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
+
+/* Кастомные кнопки */
+.btn-success {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #27ae60, #219653);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: translateY(-2px);
+}
+
+/* Навигация */
+.navbar-nav .nav-link {
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffd700 !important;
+}
+
+/* Анимации */
+.fade-in {
+    animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Кастомные badge */
+.badge {
+    font-size: 0.7em;
+}
+
+/* Улучшенный поиск */
+.input-group:focus-within {
+    box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+    border-radius: 0.375rem;
+}
+
+/* Адаптивные улучшения */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .product-card {
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Специальные классы для контента */
+.page-title {
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    color: #27ae60;
+    font-weight: 600;
+    margin: 2rem 0 1rem;
+    border-bottom: 2px solid #27ae60;
+    padding-bottom: 0.5rem;
+}
+
+/* Карусель промо-акций */
+.promo-carousel .carousel-item {
+    height: 400px;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.promo-carousel .carousel-item img {
+    object-fit: cover;
+    height: 100%;
+}
+
+/* Стили для корзины */
+.cart-item {
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem 0;
+}
+
+.cart-total {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+/* Уведомления */
+.alert-custom {
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+}
+
+/* Категории */
+.category-card {
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.category-card:hover {
+    transform: scale(1.05);
+    text-decoration: none;
+}
+
+.category-icon {
+    font-size: 3rem;
+    color: #27ae60;
+    margin-bottom: 1rem;
+}

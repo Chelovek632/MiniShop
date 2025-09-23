@@ -1,0 +1,21 @@
+<div class="fade-in col-md-6 offset-md-3">
+    <h2 class="page-title text-center">Добавить продукт</h2>
+    <form id="addProductForm" class="p-4 bg-white rounded shadow-sm">
+        <div class="mb-3">
+            <label class="form-label" for="name">Название продукта:</label>
+            <input type="text" class="form-control" id="name" name="product-name" placeholder="Введите название" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="price">Цена:</label>
+            <input type="number" class="form-control" id="price" name="product-price" min="0" step="0.01" placeholder="Введите цену" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="quantity">Количество:</label>
+            <input type="number" class="form-control" id="quantity" name="product-quantity" min="0" placeholder="Введите количество" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="imageurl">URL изображения:</label>
+            <input type="text" class="form-control" id="imageurl" name="product-imageurl" placeholder="Введите URL изображения" required>
+        <button type="submit" class="btn btn-success w-100">Добавить</button>
+    </form>
+</div>
