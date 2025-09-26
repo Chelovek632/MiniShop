@@ -19,3 +19,39 @@
         <button type="submit" class="btn btn-success w-100">Добавить</button>
     </form>
 </div>
+<div class="fade-in col-md-6 offset-md-3">
+    <h2 class="page-title text-center">Удалить продукт</h2>
+    <form id="deleteProductForm" class="p-4 bg-white rounded shadow-sm">
+        <div class="mb-3">
+            <label class="form-label" for="productId">ID продукта:</label>
+            <input type="number" class="form-control" id="productId" name="product-id" min="1" placeholder="Введите ID продукта для удаления" required>
+        </div>
+        <button type="submit" class="btn btn-danger w-100">Удалить</button>
+    </form>
+</div>
+<div class="fade-in col-md-6 offset-md-3">
+    <h2 class="page-title text-center">Редактировать продукт</h2>
+    <form id="editProductForm" class="p-4 bg-white rounded shadow-sm">
+        <div class="mb-3">
+            <label class="form-label" for="editProductId">ID продукта:</label>
+            <input type="number" class="form-control" id="editProductId" name="edit-product-id" min="1" placeholder="Введите ID продукта для редактирования" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="editName">Новое название продукта:</label>
+            <input type="text" class="form-control" id="editName" name="edit-product-name" placeholder="Введите новое название" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="editPrice">Новая цена:</label>
+            <input type="number" class="form-control" id="editPrice" name="edit-product-price" min="0" step="0.01" placeholder="Введите новую цену" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="editQuantity">Новое количество:</label>
+            <input type="number" class="form-control" id="editQuantity" name="edit-product-quantity" min="0" placeholder="Введите новое количество" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="editImageUrl">Новый URL изображения:</label>
+            <input type="text" class="form-control" id="editImageUrl" name="edit-product-imageurl" placeholder="Введите новый URL изображения" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Редактировать</button>
+    </form>
+</div>

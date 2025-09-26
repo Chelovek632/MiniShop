@@ -1,3 +1,5 @@
+// customer functions
+
 export function GetAllProducts() {
     const container = document.getElementById("products-list");
     if (!container) return;
@@ -12,10 +14,9 @@ export function GetAllProducts() {
                 const productCard = document.createElement("div");
                 productCard.className = "col-md-4 mb-4";
 
-                // Если токен есть — показываем кнопку
                 const cartButton = token
-                    ? `<button class="btn btn-success btn-sm">В корзину</button>`
-                    : "";
+                    ? `<button data-id="${product.id}" data-name="${product.name}" class="btn btn-success btn-sm buy-btn">В корзину</button>`
+                    : `<button class="btn btn-secondary btn-sm" disabled>Иди нафиг</button>`;
 
                 productCard.innerHTML = `
                 <div class="card product-card shadow-sm">
@@ -23,7 +24,9 @@ export function GetAllProducts() {
                     <div class="card-body">
                         <h5 class="card-title">${product.name}</h5>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-success">${product.price} ₽/кг</span>
+                            <span class="fw-bold text-success">${product.price} $/кг</span>
+                            <span class="badge bg-info text-dark">В наличии: ${product.stock} кг</span>
+                            <span class="badge bg-warning text-dark" id="Product-id">Id${product.id}</span>
                             ${cartButton}
                         </div>  
                     </div>
@@ -38,6 +41,27 @@ export function GetAllProducts() {
             alert("Не удалось подключиться к серверу");
         });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// admin functions
+
 
 export function AddProduct() {
     const form = document.getElementById("addProductForm");
@@ -77,6 +101,75 @@ export function AddProduct() {
             console.error("Ошибка запроса:", err);
             alert("Не удалось подключиться к серверу");
         }   
+    });
+}
+
+export function DeleteProduct() {
+    const form = document.getElementById("deleteProductForm");
+    if (!form) return;
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = document.getElementById("productId").value;
+        const token = localStorage.getItem("token");
+        try {
+            const response = await fetch(`http://localhost:5000/api/Product/delete/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+
+            });
+            const data = await response.json();
+            if (response.ok) {
+                console.log("Продукт удален:", data);
+                alert("Продукт успешно удален");
+                form.reset();
+            }
+            else {
+                alert(`Ошибка: ${data.error}`);
+            }
+        }
+        catch (err) {
+            console.error("Ошибка запроса:", err);
+            alert("Не удалось подключиться к серверу");
+        }
+    });
+}
+
+export function EditProduct() {
+    const form = document.getElementById("editProductForm");
+    if (!form) return;
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = document.getElementById("editProductId").value;
+        const name = document.getElementById("editName").value;
+        const price = document.getElementById("editPrice").value;
+        const stock = document.getElementById("editQuantity").value;
+        const imageurl = document.getElementById("editImageUrl").value;
+        const token = localStorage.getItem("token");
+        try {
+            const response = await fetch(`http://localhost:5000/api/Product/update/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ name, price, stock, imageurl })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                console.log("Продукт обновлен:", data);
+                alert("Продукт успешно обновлен");
+                form.reset();
+            }
+            else {
+                alert(`Ошибка: ${data.error}`);
+            }
+        }
+        catch (err) {
+            console.error("Ошибка запроса:", err);
+            alert("Не удалось подключиться к серверу");
+        }
     });
 }
 

@@ -56,7 +56,9 @@ namespace MiniShop.Controllers
                 id = product.Id,
                 Name = product.Name,
                 Price = product.Price,
-                Stock = product.Stock
+                Stock = product.Stock,
+                Imageurl = product.imageUrl
+                
             };
 
             return Ok(productDto);
@@ -81,13 +83,14 @@ namespace MiniShop.Controllers
         [HttpPut("update/{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] ProductCreateDto request)
         {
-            var success = await _productService.Update(id, request.Name, request.Price, request.Stock);
+            var success = await _productService.Update(id, request.Name, request.Price, request.Stock, request.Imageurl);
             if (!success)
                 return NotFound(new { error = "Product not found" });
             return Ok(new { message = "Product updated successfully" });
         }
+
         [Authorize(Roles = "Admin")]
-        [HttpDelete("delete")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var success = await _productService.Delete(id);

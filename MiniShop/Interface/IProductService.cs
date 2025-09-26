@@ -9,7 +9,7 @@ namespace MiniShop.Interface
 
         Task<Product> Create(string name, decimal price, int stock, string imageurl);
 
-        Task<bool> Update(int id, string name, decimal price, int stock);
+        Task<bool> Update(int id, string name, decimal price, int stock, string imageurl);
 
         Task<bool> Delete(int id);
     }

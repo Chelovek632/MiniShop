@@ -34,7 +34,7 @@ namespace MiniShop.Services
             await _context.SaveChangesAsync();
             return product;
         }
-        public async Task<bool> Update(int id, string name, decimal price, int stock)
+        public async Task<bool> Update(int id, string name, decimal price, int stock, string Imageurl)
         {
             var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
@@ -44,6 +44,7 @@ namespace MiniShop.Services
             product.Name = name;
             product.Price = price;
             product.Stock = stock;
+            product.imageUrl = Imageurl;
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
             return true;
@@ -51,7 +52,7 @@ namespace MiniShop.Services
 
         public async Task<bool> Delete(int id)
         { 
-             var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
             {
                 return false;

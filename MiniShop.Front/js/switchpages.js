@@ -1,5 +1,5 @@
 import { initLoginPage, initRegisterPage, updateAuthButton, OnorOfPanel, checkAdmin} from "./Account.js";
-import { GetAllProducts, AddProduct } from "./product.js";
+import { GetAllProducts, AddProduct, DeleteProduct, EditProduct} from "./product.js";
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,10 +12,15 @@ async function loadPage(page) {
     content.innerHTML = await response.text();
     OnorOfPanel();
     updateAuthButton();
+    if (page === "adminpanel") EditProduct();
+    if (page === "adminpanel") DeleteProduct();
     if (page === "adminpanel") checkAdmin();
     if (page === "login") initLoginPage();
     if (page === "register") initRegisterPage();
-    if (page === "product") GetAllProducts();
+    if (page === "product") {
+        GetAllProducts();
+    }
+    
     if (page === "adminpanel") AddProduct();
 }
 
