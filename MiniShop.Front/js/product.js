@@ -15,7 +15,8 @@ export function GetAllProducts() {
                 productCard.className = "col-md-4 mb-4";
 
                 const cartButton = token
-                    ? `<button data-id="${product.id}" data-name="${product.name}" class="btn btn-success btn-sm buy-btn">В корзину</button>`
+                    ? `<button data-id="${product.id}" data-name="${encodeURIComponent(product.name)}" data-price="${product.price}" 
+class="btn btn-success btn-sm buy-btn">В корзину</button>`
                     : `<button class="btn btn-secondary btn-sm" disabled>Иди нафиг</button>`;
 
                 productCard.innerHTML = `
@@ -43,14 +44,73 @@ export function GetAllProducts() {
 }
 
 
+export function AddToCart() {
+    const container = document.getElementById("products-list");
+    if (!container) return;
+    container.addEventListener("click", (e) => {
+        if (e.target.classList.contains("buy-btn")) {
+            const productId = e.target.getAttribute("data-id");
+            const productName = decodeURIComponent(e.target.getAttribute("data-name"));
+            const productPrice = parseFloat(e.target.getAttribute("data-price")); // цена
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ 
+                    id: productId, 
+                    name: productName, 
+                    price: productPrice, 
+                    quantity: 1 
+                });
+            }
+            localStorage.setItem("cart", JSON.stringify(cart));
+            alert(`Добавлено в корзину: ${productName}`);
+            console.log(cart);
+        }
+    });
+}
 
 
+export function ViewCart() {
+    const cartform = document.getElementById("cart-form");
+    if (!cartform) return;
 
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const cartItemsContainer = document.getElementById("cart-items-container");
+    const subtotalElement = document.getElementById("cart-subtotal");
+    const totalElement = document.getElementById("cart-total");
 
+    cartItemsContainer.innerHTML = "";
 
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = "<p>Ваша корзина пуста.</p>";
+        subtotalElement.textContent = "$0.00";
+        totalElement.textContent = "$0.00";
+        return;
+    }
 
+    let subtotal = 0;
 
+    cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
 
+        const itemElement = document.createElement("div");
+        itemElement.className = "cart-item mb-3 p-2 border rounded";
+        itemElement.innerHTML = `
+            <h5>${item.name}</h5>
+            <p>Цена: $${item.price.toFixed(2)}</p>
+            <p>Количество: ${item.quantity}</p>
+            <p class="fw-bold">Итого: $${itemTotal.toFixed(2)}</p>
+            <hr>
+        `;
+        cartItemsContainer.appendChild(itemElement);
+    });
+
+    subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+    totalElement.textContent = `$${subtotal.toFixed(2)}`; // если доставка бесплатная
+}
 
 
 

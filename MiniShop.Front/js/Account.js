@@ -65,6 +65,7 @@ export function initRegisterPage() {
 
 export function updateAuthButton() {
     const authBtn = document.getElementById("auth-btn");
+    const userIconBtn = document.getElementById("user-icon-btn");
     if (!authBtn) return;
 
     const token = localStorage.getItem("token");
@@ -81,6 +82,16 @@ export function updateAuthButton() {
         authBtn.onclick = () => {
             window.location.hash = "login";
         };
+    }
+    if (userIconBtn) {
+        if (token) {
+            userIconBtn.classList.remove("d-none");
+            userIconBtn.onclick = () => {
+                window.location.hash = "profile";
+            };
+        } else {
+            userIconBtn.classList.add("d-none");
+        }
     }
 }
 

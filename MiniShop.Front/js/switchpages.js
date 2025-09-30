@@ -1,5 +1,6 @@
 import { initLoginPage, initRegisterPage, updateAuthButton, OnorOfPanel, checkAdmin} from "./Account.js";
-import { GetAllProducts, AddProduct, DeleteProduct, EditProduct} from "./product.js";
+import { GetAllProducts, AddProduct, DeleteProduct, EditProduct, AddToCart, ViewCart} from "./product.js";
+import { Checkout, LoadOrders} from "./Order.js";
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -19,9 +20,12 @@ async function loadPage(page) {
     if (page === "register") initRegisterPage();
     if (page === "product") {
         GetAllProducts();
+        AddToCart();
     }
-    
+    if (page === "cart") Checkout();
+    if (page === "cart") ViewCart();
     if (page === "adminpanel") AddProduct();
+    if (page === "profile") LoadOrders();
 }
 
 
