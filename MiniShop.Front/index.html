@@ -3,74 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreshMarket - Магазин продуктов</title>
-    <!-- Bootstrap 5 CSS -->
+    <title>Dunder Mifflin Store - Магазин канцелярии</title>
+    <link rel="icon" type="image/png" href="image/favicon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <!-- Header -->
-    <header class="bg-success sticky-top">
+    <header class="bg-dunder sticky-top shadow-sm">
         <div class="container">
-            <!-- Top Header -->
             <div class="row align-items-center py-2">
                 <div class="col-md-3 mb-2 mb-md-0">
                     <div class="d-flex align-items-center">
-                        <i class="bi bi-basket fs-2 text-white me-2"></i>
-                        <span class="fs-3 fw-bold text-white">FreshMarket</span>
+                        <i class="bi bi-building fs-2 text-white me-2"></i>
+                        <span class="fs-3 fw-bold text-white">Dunder Mifflin</span>
                     </div>
                 </div>
                 
                 <div class="col-md-6 mb-2 mb-md-0">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Поиск продуктов...">
-                        <button class="btn btn-danger">
+                        <input type="text" class="form-control" placeholder="Поиск товаров Dunder Mifflin...">
+                        <button class="btn btn-warning">
                             <i class="bi bi-search"></i>
                         </button>
                     </div>
                 </div>
-                
-            <div class="col-md-3">
-                <div class="d-flex justify-content-end gap-2">
-                    <button id="auth-btn" class="btn btn-outline-light">
-                        <i class="bi bi-person me-1"></i>
-                        Войти
-                    </button>
-                    <button id="admin-btn" class="btn btn-outline-light d-none">
-                        <i class="bi bi-shield-lock me-1"></i>
-                        Админ панель
-                    </button>
-                    <button class="btn btn-outline-light btn-sm d-none" id="user-icon-btn">
-                        <i class="bi bi-person"></i>
-                        Профиль
-                    </button>
-                    <a href="#cart" class="btn btn-outline-light btn-sm position-relative">
-                        <i class="bi bi-cart3"></i>
-                    </a>
+
+                <div class="col-md-3">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button id="auth-btn" class="btn btn-outline-light">
+                            <i class="bi bi-person me-1"></i> Войти
+                        </button>
+                        <button id="admin-btn" class="btn btn-outline-light btn-sm d-none">
+                            <i class="bi bi-gear me-1"></i> Админ
+                        </button>
+                        <button class="btn btn-outline-light btn-sm d-none" id="user-icon-btn">
+                            <i class="bi bi-person-circle"></i> Профиль
+                        </button>
+                        <a href="#cart" class="btn btn-outline-light btn-sm position-relative">
+                            <i class="bi bi-cart3"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- Navigation -->
-            <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dunder-dark">
                 <div class="container-fluid px-0">
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav">
-                            <li class="nav-item">
-                                <a class="nav-link" href="#home">Главная</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#product">Все товары</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" href="#contacts">Контакты</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" href="#home">Главная</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#product">Каталог</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#contacts">Контакты</a></li>
                         </ul>
                     </div>
                 </div>
@@ -78,62 +65,22 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="py-4">
         <div class="container">
-            <div id="content">
-                <!-- Контент будет загружаться здесь -->
-            </div>
+            <div id="content"></div>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5 class="text-success">FreshMarket</h5>
-                    <p>Свежие продукты каждый день. Лучшее качество по доступным ценам.</p>
-                </div>
-                
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5>Категории</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#vegetables" class="text-white text-decoration-none">Овощи</a></li>
-                        <li><a href="#fruits" class="text-white text-decoration-none">Фрукты</a></li>
-                        <li><a href="#meat" class="text-white text-decoration-none">Мясо</a></li>
-                        <li><a href="#dairy" class="text-white text-decoration-none">Молочные продукты</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5>Контакты</h5>
-                    <p><i class="bi bi-telephone"></i> +7 (999) 123-45-67</p>
-                    <p><i class="bi bi-envelope"></i> info@freshmarket.ru</p>
-                    <p><i class="bi bi-geo-alt"></i> Москва, ул. Продовольственная, 123</p>
-                </div>
-                
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5>Мы в соцсетях</h5>
-                    <div class="d-flex gap-3">
-                        <a href="#" class="text-white fs-4"><i class="bi bi-vimeo"></i></a>
-                        <a href="#" class="text-white fs-4"><i class="bi bi-telegram"></i></a>
-                        <a href="#" class="text-white fs-4"><i class="bi bi-instagram"></i></a>
-                    </div>
-                </div>
-            </div>
-            
+    <footer class="bg-dunder-dark text-white py-5">
+        <div class="container text-center">
+            <h5 class="text-warning mb-3">Dunder Mifflin Paper Company</h5>
+            <p>Корпоративная канцелярия, которой доверяют офисы по всему миру.</p>
             <hr class="bg-light">
-            
-            <div class="text-center">
-                <p class="mb-0">&copy; 2024 FreshMarket. Все права защищены.</p>
-            </div>
+            <p class="mb-0">&copy; 2025 Dunder Mifflin Inc. Все права защищены.</p>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
     <script src="js/switchpages.js" type="module"></script>
 </body>
 </html>

@@ -33,7 +33,7 @@ namespace MiniShop.Controllers
             var result = products.Select(p => new ProductDto
             {
                 id = p.Id,
-                Stock = p.Id,
+                Stock = p.Stock,
                 Name = p.Name,
                 Price = p.Price,
                 Imageurl = p.imageUrl

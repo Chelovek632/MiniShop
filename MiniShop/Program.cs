@@ -23,6 +23,7 @@ namespace MiniShop
             builder.Services.AddScoped<IProductService, Services.ProductService>();
             builder.Services.AddScoped<IUserService, Services.UserService>();
             builder.Services.AddScoped<IOrderService, Services.OrderService>();
+            builder.Services.AddScoped<ICartService, Services.CartService>();
             builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 
             // Если нужен Swagger для тестирования API

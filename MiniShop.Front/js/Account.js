@@ -22,7 +22,7 @@ export function initLoginPage() {
             if (response.ok) {
                 console.log("Успешный вход:", data);
                 localStorage.setItem("token", data.token);
-                localStorage.setItem("isAdmin", data.role); // сохраняем роль
+                localStorage.setItem("isAdmin", data.role); 
                 window.location.hash = "home";
             } else {
                 alert(`Ошибка: ${data.error}`);
@@ -74,6 +74,7 @@ export function updateAuthButton() {
         authBtn.textContent = "Выйти";
         authBtn.onclick = () => {
             localStorage.removeItem("token");
+            localStorage.removeItem("isAdmin");
             window.location.hash = "login";
             updateAuthButton(); // обновляем снова
         };
@@ -100,6 +101,7 @@ export function OnorOfPanel() {
     if (!adminBtn) return;
     const isAdmin = localStorage.getItem("isAdmin");
     if (isAdmin === "Admin") {
+        console.log(isAdmin);
         adminBtn.classList.remove("d-none");
         adminBtn.onclick = () => {
             window.location.hash = "adminpanel";

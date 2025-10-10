@@ -1,25 +1,24 @@
 <div class="fade-in col-lg-8 offset-lg-2 col-md-10 offset-md-1">
-    <h2 class="page-title text-center mb-4">Ваша Корзина 🛒</h2>
-    
+    <h2 class="page-title text-center mb-4 text-dunder">🛒 Ваша Корзина</h2>
+    <p class="text-center text-muted mb-4 fst-italic">"Вы промахиваетесь 100% из 100 бросков, которые не делаете." — Michael Scott</p>
+
     <form id="cart-form" class="mb-4">
-        
-        <div class="card rounded shadow-sm">
-            <div class="card-header bg-white">
-                <h5 class="mb-0" id="cart-header-title">Товары в Корзине </h5>
+        <div class="card rounded shadow-sm border-0">
+            <div class="card-header bg-dunder text-white">
+                <h5 class="mb-0" id="cart-header-title">Товары в корзине</h5>
             </div>
             <div class="card-body" id="cart-items-container">
                 <p id="empty-cart-message" class="text-center text-muted m-0">Ваша корзина пока пуста. 😔</p>
             </div>
             <div class="card-footer bg-light text-end">
-                 <a href="#product" class="btn btn-outline-secondary me-2">Продолжить покупки</a>
-                 <button type="submit" class="btn btn-primary" id="update-cart-btn" disabled>Обновить Корзину</button>
+                 <a href="#product" class="btn btn-outline-light me-2 bg-dunder">Продолжить покупки</a>
+                 <button type="submit" class="btn btn-warning" id="update-cart-btn" disabled>Обновить корзину</button>
             </div>
         </div>
-        
     </form>
-    
-    <div class="card p-4 rounded shadow-sm mt-4">
-        <h4 class="mb-3">Сводка Заказа</h4>
+
+    <div class="card p-4 rounded shadow-sm mt-4 border-0">
+        <h4 class="mb-3 text-dunder">Сводка заказа</h4>
         <ul class="list-group list-group-flush mb-3" id="order-summary-list">
             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                 Промежуточный итог:
@@ -30,12 +29,12 @@
                 <span id="cart-shipping" class="text-success fw-bold">Бесплатно</span>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center px-0 border-top mt-2 pt-2">
-                <span class="fs-5">Общая Сумма:</span>
-                <span id="cart-total" class="fs-5 text-success fw-bold">$0.00</span>
+                <span class="fs-5">Общая сумма:</span>
+                <span id="cart-total" class="fs-5 text-dunder fw-bold">$0.00</span>
             </li>
         </ul>
-        
-        <a href="#checkout" id="checkout-btn" class="btn btn-success w-100 btn-lg" role="button" disabled>Оформить Заказ</a>
+        <a href="#checkout" id="checkout-btn" class="btn btn-warning w-100 btn-lg" role="button" disabled>
+            Оформить заказ
+        </a>
     </div>
-
 </div>

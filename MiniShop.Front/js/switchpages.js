@@ -22,8 +22,8 @@ async function loadPage(page) {
         GetAllProducts();
         AddToCart();
     }
-    if (page === "cart") Checkout();
     if (page === "cart") ViewCart();
+    if (page === "cart") Checkout();
     if (page === "adminpanel") AddProduct();
     if (page === "profile") LoadOrders();
 }

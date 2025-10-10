@@ -10,13 +10,16 @@ export function GetAllProducts() {
         .then(response => response.json())
         .then(data => {
             container.innerHTML = "";
+            if (data.length === 0) {
+                container.innerHTML = "<p>Нет доступных товаров.</p>";
+            }
             data.forEach(product => {
                 const productCard = document.createElement("div");
                 productCard.className = "col-md-4 mb-4";
 
                 const cartButton = token
-                    ? `<button data-id="${product.id}" data-name="${encodeURIComponent(product.name)}" data-price="${product.price}" 
-class="btn btn-success btn-sm buy-btn">В корзину</button>`
+                    ? `<button data-id="${product.id}" data-name="${encodeURIComponent(product.name)}"
+class="btn btn-warning btn-sm buy-btn">В корзину</button>`
                     : `<button class="btn btn-secondary btn-sm" disabled>Иди нафиг</button>`;
 
                 productCard.innerHTML = `
@@ -25,8 +28,8 @@ class="btn btn-success btn-sm buy-btn">В корзину</button>`
                     <div class="card-body">
                         <h5 class="card-title">${product.name}</h5>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-success">${product.price} $/кг</span>
-                            <span class="badge bg-info text-dark">В наличии: ${product.stock} кг</span>
+                            <span class="fw-bold text-success">${product.price} $</span>
+                            <span class="badge bg-info text-dark">В наличии: ${product.stock}</span>
                             <span class="badge bg-warning text-dark" id="Product-id">Id${product.id}</span>
                             ${cartButton}
                         </div>  
@@ -47,69 +50,116 @@ class="btn btn-success btn-sm buy-btn">В корзину</button>`
 export function AddToCart() {
     const container = document.getElementById("products-list");
     if (!container) return;
-    container.addEventListener("click", (e) => {
-        if (e.target.classList.contains("buy-btn")) {
-            const productId = e.target.getAttribute("data-id");
-            const productName = decodeURIComponent(e.target.getAttribute("data-name"));
-            const productPrice = parseFloat(e.target.getAttribute("data-price")); // цена
-            let cart = JSON.parse(localStorage.getItem("cart")) || [];
-            const existingItem = cart.find(item => item.id === productId);
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({ 
-                    id: productId, 
-                    name: productName, 
-                    price: productPrice, 
-                    quantity: 1 
-                });
+
+    container.addEventListener("click", async (e) => {
+        if (!e.target.classList.contains("buy-btn")) return;
+
+        const productId = parseInt(e.target.getAttribute("data-id"));
+        const productName = decodeURIComponent(e.target.getAttribute("data-name"));
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Сначала войдите в систему!");
+            window.location.hash = "login";
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:5000/api/Cart/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    items: [
+                        {
+                            productId: productId,
+                            quantity: 1
+                        }
+                    ]
+                })
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || "Ошибка при добавлении в корзину");
             }
-            localStorage.setItem("cart", JSON.stringify(cart));
-            alert(`Добавлено в корзину: ${productName}`);
-            console.log(cart);
+
+            const result = await response.json();
+            console.log("✅ Обновлённая корзина:", result);
+
+            alert(`Товар "${productName}" добавлен в корзину!`);
+        } catch (err) {
+            console.error("Ошибка:", err);
+            alert("Не удалось добавить товар в корзину: " + err.message);
         }
     });
 }
 
 
-export function ViewCart() {
-    const cartform = document.getElementById("cart-form");
-    if (!cartform) return;
 
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const cartItemsContainer = document.getElementById("cart-items-container");
-    const subtotalElement = document.getElementById("cart-subtotal");
-    const totalElement = document.getElementById("cart-total");
+export async function ViewCart() {
+    const container = document.getElementById("cart-items-container");
+    const totalPriceElement = document.getElementById("cart-total");
 
-    cartItemsContainer.innerHTML = "";
-
-    if (cart.length === 0) {
-        cartItemsContainer.innerHTML = "<p>Ваша корзина пуста.</p>";
-        subtotalElement.textContent = "$0.00";
-        totalElement.textContent = "$0.00";
+    const token = localStorage.getItem("token");
+    if (!token) {
+        container.innerHTML = "<p>Пожалуйста, войдите в систему.</p>";
         return;
     }
 
-    let subtotal = 0;
+    try {
+        const res = await fetch("http://localhost:5000/api/Cart/getCarts", {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
 
-    cart.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        subtotal += itemTotal;
+        if (!res.ok) throw new Error("Ошибка при получении корзины");
 
-        const itemElement = document.createElement("div");
-        itemElement.className = "cart-item mb-3 p-2 border rounded";
-        itemElement.innerHTML = `
-            <h5>${item.name}</h5>
-            <p>Цена: $${item.price.toFixed(2)}</p>
-            <p>Количество: ${item.quantity}</p>
-            <p class="fw-bold">Итого: $${itemTotal.toFixed(2)}</p>
-            <hr>
-        `;
-        cartItemsContainer.appendChild(itemElement);
-    });
+        const carts = await res.json(); 
 
-    subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
-    totalElement.textContent = `$${subtotal.toFixed(2)}`; // если доставка бесплатная
+        if (!carts || carts.length === 0) {
+            container.innerHTML = "<p>Ваша корзина пуста.</p>";
+            totalPriceElement.textContent = "$0.00";
+            return;
+        }
+
+        container.innerHTML = "";
+        let total = 0;
+
+        carts.forEach(cart => { 
+            let cartTotal = 0;
+            const itemsHtml = (cart.items || []).map(item => {
+                const price = Number(item.product?.price) || 0;
+                const quantity = Number(item.quantity) || 0;
+                const itemTotal = price * quantity;
+                cartTotal += itemTotal;
+                return `
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        ${item.product?.name || "Неизвестно"} (x${quantity}) - $${price} each
+                        <span>$${itemTotal}</span>
+                    </li>
+                `;
+            }).join("");
+            total += cartTotal;
+            const row = document.createElement("div");
+            row.className = "cart-item mb-3 p-2 border rounded";
+            row.innerHTML = `
+                <div class="card-body">
+                    <ul class="list-group mb-3">
+                        ${itemsHtml}
+                    </ul>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+        totalPriceElement.textContent = `$${total.toFixed(2)}`;
+
+
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = "<p>Ошибка загрузки корзины.</p>";
+    }
 }
 
 
@@ -127,7 +177,7 @@ export function AddProduct() {
     const form = document.getElementById("addProductForm");
     if (!form) return;
     form.addEventListener("submit", async (e) => {
-        e.preventDefault(); // чтобы страница не перезагружалась
+        e.preventDefault();
         const name = document.getElementById("name").value;
         const price = document.getElementById("price").value;
         const stock = document.getElementById("quantity").value;

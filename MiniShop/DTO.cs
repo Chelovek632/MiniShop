@@ -39,5 +39,14 @@
             public int ProductId { get; set; }
             public int Quantity { get; set; }
         }
+        public class CreateCartDto
+        {
+            public List<CartItemDto> Items { get; set; }
+        }
+        public class CartItemDto
+        {
+            public int ProductId { get; set; }
+            public int Quantity { get; set; }
+        }
     }
 }

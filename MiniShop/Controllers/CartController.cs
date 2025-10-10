@@ -11,24 +11,26 @@ namespace MiniShop.Controllers
     [Route("api/[controller]")]
     [Authorize]
 
-    public class OrdersController : ControllerBase
+    public class CartController : ControllerBase
     {
-        private readonly IOrderService _orderService;
+        private readonly ICartService _CartService;
+        private readonly IJwtProvider _jwtProvider;
 
-        public OrdersController(IOrderService orderService)
+        public CartController(ICartService CartService, IJwtProvider jwtProvider)
         {
-            _orderService = orderService;
+            _CartService = CartService;
+            _jwtProvider = jwtProvider;
         }
         //var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto request)
+        public async Task<IActionResult> CreateCart([FromBody] CreateCartDto request)
         {
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var order = await _orderService.CreateOrder(userId, request.Items);
-                return Ok(order);
+                var Cart = await _CartService.CreateCart(userId, request.Items);
+                return Ok(Cart);
             }
             catch (Exception ex)
             {
@@ -36,30 +38,30 @@ namespace MiniShop.Controllers
             }
         }
 
-        [HttpGet("getorders")]
-        public async Task<IActionResult> GetOrdersByUser()
+        [HttpGet("getCarts")]
+        public async Task<IActionResult> GetCartsByUser()
         {
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var orders = await _orderService.GetUserOrders(userId);
-                return Ok(orders);
+                var Carts = await _CartService.GetUserCarts(userId);
+                return Ok(Carts);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
         }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetOrderById(int id)
+
+        [HttpDelete("clear")]
+
+        public async Task<IActionResult> DeleteCartsByUser()
         {
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var order = await _orderService.GetById(id, userId);
-                if (order == null)
-                    return NotFound(new { error = "Order not found" });
-                return Ok(order);
+                await _CartService.DeleteCarts(userId);
+                return Ok(new { message = "Carts deleted successfully" });
             }
             catch (Exception ex)
             {
