@@ -1,5 +1,6 @@
 export function Checkout() {
     const btn = document.getElementById("checkout-btn");
+    const addressInput = document.getElementById("delivery-address");
     if (!btn) return;
 
     btn.addEventListener("click", async (e) => {
@@ -9,6 +10,11 @@ export function Checkout() {
         if (!token) {
             alert("Сначала войдите в систему!");
             window.location.hash = "login";
+            return;
+        }
+ 
+        if (addressInput.value.trim() === "") {
+            alert("Пожалуйста, введите адрес доставки.");
             return;
         }
 
@@ -30,14 +36,22 @@ export function Checkout() {
                 return;
             }
             
+            const groupedItems = Object.values(
+                allItems.reduce((acc, item) => {
+                    if (!acc[item.productId]) {
+                        acc[item.productId] = { productId: item.productId, quantity: item.quantity };
+                    } else {
+                        acc[item.productId].quantity += item.quantity;
+                    }
+                    return acc;
+                }, {})
+            );
+            
             const orderData = {
-                items: allItems.map(item => ({
-                    productId: item.productId,
-                    quantity: item.quantity
-                }))
+                address: addressInput.value.trim(),
+                items: groupedItems
             };
             
-            // создаём заказ
             const response = await fetch("http://localhost:5000/api/Orders/create", {
                 method: "POST",
                 headers: {

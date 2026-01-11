@@ -27,7 +27,7 @@ namespace MiniShop.Controllers
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var order = await _orderService.CreateOrder(userId, request.Items);
+                var order = await _orderService.CreateOrder(userId, request.Items,request.Address);
                 return Ok(order);
             }
             catch (Exception ex)

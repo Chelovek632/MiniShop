@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MiniShop.Interface;
+using MiniShop.Services;    
 using System.Text;
 
 namespace MiniShop
@@ -20,10 +21,10 @@ namespace MiniShop
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddScoped<IProductService, Services.ProductService>();
-            builder.Services.AddScoped<IUserService, Services.UserService>();
-            builder.Services.AddScoped<IOrderService, Services.OrderService>();
-            builder.Services.AddScoped<ICartService, Services.CartService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 
             // Если нужен Swagger для тестирования API
@@ -96,7 +97,7 @@ namespace MiniShop
 
             app.UseHttpsRedirection();
             app.UseCors("AllowFrontend"); 
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

@@ -1,6 +1,8 @@
 <div class="fade-in col-lg-8 offset-lg-2 col-md-10 offset-md-1">
     <h2 class="page-title text-center mb-4 text-dunder">🛒 Ваша Корзина</h2>
-    <p class="text-center text-muted mb-4 fst-italic">"Вы промахиваетесь 100% из 100 бросков, которые не делаете." — Michael Scott</p>
+    <p class="text-center text-muted mb-4 fst-italic">
+        "Вы промахиваетесь 100% из 100 бросков, которые не делаете." — Michael Scott
+    </p>
 
     <form id="cart-form" class="mb-4">
         <div class="card rounded shadow-sm border-0">
@@ -11,8 +13,8 @@
                 <p id="empty-cart-message" class="text-center text-muted m-0">Ваша корзина пока пуста. 😔</p>
             </div>
             <div class="card-footer bg-light text-end">
-                 <a href="#product" class="btn btn-outline-light me-2 bg-dunder">Продолжить покупки</a>
-                 <button type="submit" class="btn btn-warning" id="update-cart-btn" disabled>Обновить корзину</button>
+                <a href="#product" class="btn btn-outline-light me-2 bg-dunder">Продолжить покупки</a>
+                <button type="submit" class="btn btn-warning" id="update-cart-btn" disabled>Обновить корзину</button>
             </div>
         </div>
     </form>
@@ -33,7 +35,19 @@
                 <span id="cart-total" class="fs-5 text-dunder fw-bold">$0.00</span>
             </li>
         </ul>
-        <a href="#checkout" id="checkout-btn" class="btn btn-warning w-100 btn-lg" role="button" disabled>
+
+        <!-- 🏠 Поле для адреса доставки -->
+        <div class="mb-3">
+            <label for="delivery-address" class="form-label fw-bold text-dunder">Адрес доставки</label>
+            <input 
+                type="text" 
+                id="delivery-address" 
+                class="form-control" 
+                placeholder="Введите ваш адрес (улица, дом, квартира)" 
+                required>
+        </div>
+
+        <a href="#product" id="checkout-btn" class="btn btn-warning w-100 btn-lg" role="button" disabled>
             Оформить заказ
         </a>
     </div>

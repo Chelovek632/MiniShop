@@ -6,7 +6,7 @@ namespace MiniShop.Interface
 {
     public interface IOrderService
     {
-        Task<Order> CreateOrder(int userId, List<OrderItemDto> items);
+        Task<Order> CreateOrder(int userId, List<OrderItemDto> items, string address);
         Task<List<Order>> GetUserOrders(int userId);
         Task<Order?> GetById(int id, int userId);
     }

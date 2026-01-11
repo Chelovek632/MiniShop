@@ -16,13 +16,15 @@ namespace MiniShop.Services
 
         }
 
-        public async Task<Order> CreateOrder(int userId, List<OrderItemDto> items)
+        public async Task<Order> CreateOrder(int userId, List<OrderItemDto> items, string address)
         {
             // 1. Создание объектов заказа и элементов...
             var order = new Order
             {
                 UserId = userId,
                 CreatedAt = DateTime.UtcNow,
+                Status = "В обработке",
+                Address = address,
                 Items = new List<OrderItem>()
             };
 

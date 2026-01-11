@@ -31,6 +31,7 @@
 
         public class CreateOrderDto
         {
+            public string Address { get; set; }
             public List<OrderItemDto> Items { get; set; }
         }
 
