@@ -55,3 +55,40 @@
         <button type="submit" class="btn btn-primary w-100">Редактировать</button>
     </form>
 </div>
+
+<div class="fade-in col-md-6 offset-md-3">
+    <h2 class="page-title text-center">Изменить статус заказа</h2>
+
+    <form id="updateOrderStatusForm" class="p-4 bg-white rounded shadow-sm">
+        <div class="mb-3">
+            <label class="form-label" for="orderId">ID заказа:</label>
+            <input type="number"
+                   class="form-control"
+                   id="orderId"
+                   min="1"
+                   placeholder="Введите ID заказа"
+                   required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="orderStatus">Статус заказа:</label>
+            <select class="form-select" id="orderStatus" required>
+                <option value="Pending">В обработке</option>
+                <option value="Paid">Оплачен</option>
+                <option value="Shipped">Отправлен</option>
+                <option value="Delivered">Доставлен</option>
+                <option value="Canceled">Отменён</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-warning w-100">
+            Обновить статус
+        </button>
+    </form>
+</div>
+
+<div class="fade-in col-md-10 offset-md-1">
+    <h2 class="page-title text-center">Все заказы</h2>
+
+    <div id="admin-orders-container"></div>
+</div>

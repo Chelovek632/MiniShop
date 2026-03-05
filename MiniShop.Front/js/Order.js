@@ -167,3 +167,112 @@ export function LoadOrders() {
         container.innerHTML = "<p>Не удалось загрузить заказы.</p>";
     }); 
 }
+
+export function AdminOrderStatus() {
+    const form = document.getElementById("updateOrderStatusForm");
+    if (!form) return;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const orderId = document.getElementById("orderId").value;
+        const status = document.getElementById("orderStatus").value;
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            alert("Нет авторизации");
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `http://localhost:5000/api/Orders/${orderId}/status`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status })
+                }
+            );
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text);
+            }
+
+            alert("✅ Статус заказа обновлён");
+            form.reset();
+
+        } catch (err) {
+            alert("❌ Ошибка: " + err.message);
+        }
+    });
+}
+
+
+export function LoadAdminOrders() {
+    const container = document.getElementById("admin-orders-container");
+    if (!container) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+        container.innerHTML = "<p>Нет доступа</p>";
+        return;
+    }
+
+    container.innerHTML = "<p>Загрузка заказов...</p>";
+
+    fetch("http://localhost:5000/api/Orders/all", {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
+    .then(r => r.json())
+    .then(orders => {
+        if (!orders || orders.length === 0) {
+            container.innerHTML = "<p>Заказов нет</p>";
+            return;
+        }
+
+        container.innerHTML = "";
+
+        orders.forEach(order => {
+            const div = document.createElement("div");
+            div.className = "card mb-3 shadow-sm";
+
+            div.innerHTML = `
+                <div class="card-header d-flex justify-content-between">
+                    <strong>Заказ #${order.id}</strong>
+                    <span class="badge bg-info">${order.status}</span>
+                </div>
+
+                <div class="card-body">
+                    <p><b>Пользователь:</b> ${order.userLogin ?? "—"}</p> 
+                    
+                    <ul class="list-group mb-3">
+                        ${order.items.map(i => `
+                            <li class="list-group-item d-flex justify-content-between">
+                                ${i.productName} x${i.quantity}
+                                <span>$${(i.price * i.quantity).toFixed(2)}</span>
+                            </li>
+                        `).join("")}
+                    </ul>
+
+                    <div class="alert alert-light text-center border">
+                        Статус: <b>${order.status}</b>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(div);
+        });
+
+        // Мы удалили вызов attachStatusHandlers, так как ты хочешь только показывать
+    })
+    .catch(err => {
+        console.error("Ошибка загрузки:", err);
+        container.innerHTML = "<p>Ошибка при загрузке данных</p>";
+    });
+}

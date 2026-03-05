@@ -66,5 +66,23 @@ namespace MiniShop.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id,[FromBody] UpdateOrderStatusDto dto)
+        {
+            await _orderService.UpdateStatus(id, dto.Status);
+            return Ok();
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllOrdersForAdmin()
+        {
+            var orders = await _orderService.GetAllOrdersForAdmin();
+            return Ok(orders); 
+        }
+
     }
 }

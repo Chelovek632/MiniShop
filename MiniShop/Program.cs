@@ -1,6 +1,7 @@
-
+ï»¿
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 using MiniShop.Interface;
 using MiniShop.Services;    
@@ -27,7 +28,7 @@ namespace MiniShop
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 
-            // Åñëè íóæåí Swagger äëÿ òåñòèðîâàíèÿ API
+            // Ã…Ã±Ã«Ã¨ Ã­Ã³Ã¦Ã¥Ã­ Swagger Ã¤Ã«Ã¿ Ã²Ã¥Ã±Ã²Ã¨Ã°Ã®Ã¢Ã Ã­Ã¨Ã¿ API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
@@ -75,9 +76,22 @@ namespace MiniShop
                             Encoding.UTF8.GetBytes("super_secret_key_must_be_at_least_32_chars_long"))
                     };
                 });
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(
+                        new JsonStringEnumConverter()
+                    );
+                });
             builder.Services.AddCors(options => {
                 options.AddPolicy("AllowFrontend", policy => {
-                    policy.WithOrigins("http://127.0.0.1:5500")
+                    policy.WithOrigins(
+                        "http://127.0.0.1:5500",
+                "http://localhost:5500",
+                "http://localhost:3000",
+                "http://localhost"
+                        )
+
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });
@@ -102,6 +116,8 @@ namespace MiniShop
 
 
             app.MapControllers();
+
+
 
             app.Run();
         }

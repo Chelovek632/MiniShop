@@ -1,4 +1,6 @@
-﻿namespace MiniShop
+﻿using MiniShop.Models.Enums;
+
+namespace MiniShop
 {
     public class DTO
     {
@@ -47,6 +49,26 @@
         public class CartItemDto
         {
             public int ProductId { get; set; }
+            public int Quantity { get; set; }
+        }
+        public class UpdateOrderStatusDto
+        {
+            public OrderStatus Status { get; set; }
+        }
+
+        public class AdminOrderDto
+        {
+            public int Id { get; set; }
+            public string UserLogin { get; set; }
+            public OrderStatus Status { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public List<AdminOrderItemDto> Items { get; set; }
+        }
+
+        public class AdminOrderItemDto
+        {
+            public string ProductName { get; set; }
+            public decimal Price { get; set; }
             public int Quantity { get; set; }
         }
     }
