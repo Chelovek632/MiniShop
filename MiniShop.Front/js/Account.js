@@ -5,8 +5,7 @@ export function initLoginPage() {
     if (!form) return;
 
     form.addEventListener("submit", async (e) => {
-        e.preventDefault(); // чтобы страница не перезагружалась
-
+        e.preventDefault(); 
         const login = document.getElementById("login-email").value;
         const password = document.getElementById("login-password").value;
 

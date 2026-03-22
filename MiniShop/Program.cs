@@ -15,7 +15,6 @@ namespace MiniShop
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
 
             builder.Services.AddControllers();
 
@@ -28,7 +27,6 @@ namespace MiniShop
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 
-            // Åñëè íóæåí Swagger äëÿ òåñòèðîâàíèÿ API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
@@ -86,10 +84,7 @@ namespace MiniShop
             builder.Services.AddCors(options => {
                 options.AddPolicy("AllowFrontend", policy => {
                     policy.WithOrigins(
-                        "http://127.0.0.1:5500",
-                "http://localhost:5500",
-                "http://localhost:3000",
-                "http://localhost"
+                        "http://127.0.0.1:5500"
                         )
 
                           .AllowAnyHeader()
@@ -109,7 +104,7 @@ namespace MiniShop
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseCors("AllowFrontend"); 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -117,7 +112,11 @@ namespace MiniShop
 
             app.MapControllers();
 
-
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                db.Database.Migrate();
+            }
 
             app.Run();
         }
