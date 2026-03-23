@@ -1,13 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
-
 namespace MiniShop.Migrations
 {
-    /// <inheritdoc />
     public partial class AddOrderStatusAndAddress : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
@@ -17,24 +13,18 @@ namespace MiniShop.Migrations
                 nullable: false,
                 defaultValue: "");
 
-            migrationBuilder.AddColumn<string>(
+            migrationBuilder.AddColumn<int>(
                 name: "Status",
                 table: "Orders",
-                type: "text",
+                type: "integer",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: 0);
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Address",
-                table: "Orders");
-
-            migrationBuilder.DropColumn(
-                name: "Status",
-                table: "Orders");
+            migrationBuilder.DropColumn(name: "Address", table: "Orders");
+            migrationBuilder.DropColumn(name: "Status", table: "Orders");
         }
     }
 }
