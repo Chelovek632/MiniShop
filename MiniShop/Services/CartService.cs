@@ -6,24 +6,19 @@ using static MiniShop.DTO;
 
 namespace MiniShop.Services
 {
-    // Сервис корзины
-    // Тут всё, что связано с тем, что пользователь накидал перед заказом
     public class CartService : ICartService
     {
         private readonly AppDbContext _context;
 
-        // Подключаем контекст базы
         public CartService(AppDbContext context)
         {
             _context = context;
         }
 
-        // Создание корзины
-        // На вход приходит список товаров, которые пользователь выбрал
+        // Добавление товаров в корзину
+        // Если корзина уже есть — добавляем в неё, если нет — создаём новую
         public async Task<Cart> CreateCart(int userId, List<CartItemDto> items)
         {
-            // Сначала пробегаемся по всем товарам
-            // Проверяем, что они вообще существуют и их хватает
             foreach (var i in items)
             {
                 var product = await _context.Products.FindAsync(i.ProductId);
@@ -35,13 +30,35 @@ namespace MiniShop.Services
                     throw new Exception($"Недостаточно товара: {product.Name}");
             }
 
-            // Если всё ок, собираем корзину
-            var Cart = new Cart
+            var existingCart = await _context.Carts
+                .Include(c => c.Items)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (existingCart != null)
+            {
+                foreach (var i in items)
+                {
+                    var existingItem = existingCart.Items
+                        .FirstOrDefault(ci => ci.ProductId == i.ProductId);
+
+                    if (existingItem != null)
+                        existingItem.Quantity += i.Quantity;
+                    else
+                        existingCart.Items.Add(new CartItem
+                        {
+                            ProductId = i.ProductId,
+                            Quantity = i.Quantity
+                        });
+                }
+
+                await _context.SaveChangesAsync();
+                return existingCart;
+            }
+
+            var cart = new Cart
             {
                 UserId = userId,
                 CreatedAt = DateTime.UtcNow,
-
-                // Тут по каждому товару из DTO создаём CartItem
                 Items = items.Select(i => new CartItem
                 {
                     ProductId = i.ProductId,
@@ -49,66 +66,36 @@ namespace MiniShop.Services
                 }).ToList()
             };
 
-            // Добавляем корзину в базу
-            await _context.Carts.AddAsync(Cart);
-
-            // Сохраняем, чтобы корзина реально появилась
+            await _context.Carts.AddAsync(cart);
             await _context.SaveChangesAsync();
 
-            return Cart;
+            return cart;
         }
 
-        // Получение всех корзин пользователя
-        public async Task<List<Cart>> GetUserCarts(int userId)
+        // Получение корзины пользователя (одна, не список)
+        public async Task<Cart?> GetUserCart(int userId)
         {
             return await _context.Carts
-                .Where(o => o.UserId == userId)
-
-                // Подгружаем элементы корзины
-                .Include(o => o.Items)
-
-                // И сразу продукты, чтобы фронт не страдал
-                .ThenInclude(oi => oi.Product)
-                .ToListAsync();
-        }
-
-        // Очистка всех корзин пользователя
-        // Используется после оформления заказа
-        public async Task DeleteCarts(int userId)
-        {
-            // Забираем все корзины пользователя
-            var userCarts = await _context.Carts
                 .Where(c => c.UserId == userId)
                 .Include(c => c.Items)
-                .ToListAsync();
+                .ThenInclude(ci => ci.Product)
+                .FirstOrDefaultAsync();
+        }
 
-            // Если корзины вообще есть
-            if (userCarts.Any())
+        // Очистка корзины
+        public async Task DeleteCart(int userId)
+        {
+            var cart = await _context.Carts
+                .Where(c => c.UserId == userId)
+                .Include(c => c.Items)
+                .FirstOrDefaultAsync();
+
+            if (cart != null)
             {
-                // Сначала удаляем все CartItems
-                // Иначе база начнёт ругаться
-                foreach (var cart in userCarts)
-                {
-                    _context.CartItems.RemoveRange(cart.Items);
-                }
-
-                // Потом удаляем сами корзины
-                _context.Carts.RemoveRange(userCarts);
-
-                // Фиксируем, что пользователь теперь с пустыми руками
+                _context.CartItems.RemoveRange(cart.Items);
+                _context.Carts.Remove(cart);
                 await _context.SaveChangesAsync();
             }
         }
-
-        // Этот метод пока не нужен, но пусть полежит
-        // Возможно пригодится позже
-        //public async Task<Cart?> GetById(int id, int userId)
-        //{
-        //    return await _context.Carts
-        //        .Where(o => o.UserId == userId)
-        //        .Include(o => o.Items)
-        //        .ThenInclude(oi => oi.Product)
-        //        .FirstOrDefaultAsync(o => o.Id == id);
-        //}
     }
 }

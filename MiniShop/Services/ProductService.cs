@@ -5,36 +5,27 @@ using MiniShop.Models;
 
 namespace MiniShop.Services
 {
-    // Сервис для работы с продуктами
     public class ProductService : IProductService
     {
         private readonly AppDbContext _context;
 
-        // Прокидываем DbContext
         public ProductService(AppDbContext context)
         {
             _context = context;
         }
 
-        // Забираем вообще все товары из базы
-        // Без фильтров, без условий, просто всё
         public async Task<List<Product>> GetAll()
         {
             return await _context.Products.ToListAsync();
         }
 
-        // Ищем товар по id
-        // Если не нашли, вернётся null 
         public async Task<Product?> GetById(int id)
         {
             return await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        // Создание нового товара
-        // Просто берём данные и закидываем в базу
         public async Task<Product> Create(string name, decimal price, int stock, string imageurl)
         {
-            // Собираем объект товара
             var product = new Product
             {
                 Name = name,
@@ -43,62 +34,51 @@ namespace MiniShop.Services
                 imageUrl = imageurl
             };
 
-            // Добавляем в контекст
             _context.Products.Add(product);
-
-            // Сохраняем, чтобы он реально появился в базе
             await _context.SaveChangesAsync();
 
             return product;
         }
 
-        // Обновление товара по id
-        // Если товара нет, просто говорим, чтоб нахер шёл, ничего нет
-        public async Task<bool> Update(int id, string name, decimal price, int stock, string Imageurl)
+        // Обновляем только те поля, которые пришли (не null)
+        public async Task<bool> Update(int id, string? name, decimal? price, int? stock, string? imageurl)
         {
-            // Пытаемся найти товар
             var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
 
-            // Если не нашли, дальше смысла нет
             if (product == null)
-            {
                 return false;
-            }
 
-            // Переписываем значения
-            product.Name = name;
-            product.Price = price;
-            product.Stock = stock;
-            product.imageUrl = Imageurl;
+            if (name != null)
+                product.Name = name;
 
-            // Говорим EF что товар обновился
+            if (price != null)
+                product.Price = price.Value;
+
+            if (stock != null)
+                product.Stock = stock.Value;
+
+            if (imageurl != null)
+                product.imageUrl = imageurl;
+
             _context.Products.Update(product);
-
-            // Фиксируем изменения
             await _context.SaveChangesAsync();
 
             return true;
         }
 
-        // Удаление товара
-        // Опять же, если не нашли, просто false
         public async Task<bool> Delete(int id)
         {
-            // Ищем товар
             var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
-
-            // Нечего удалять
             if (product == null)
-            {
                 return false;
-            }
 
-            // Выпиливаем из базы
+            bool isReferenced = await _context.OrderItems.AnyAsync(oi => oi.ProductId == id)|| await _context.CartItems.AnyAsync(ci => ci.ProductId == id);
+
+            if (isReferenced)
+                throw new Exception("Нельзя удалить товар — он используется в заказах или корзинах");
+
             _context.Products.Remove(product);
-
-            // Сохраняем, чтобы он реально исчез
             await _context.SaveChangesAsync();
-
             return true;
         }
     }

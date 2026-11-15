@@ -30,35 +30,44 @@ namespace MiniShop.Services
                 throw new Exception("Неверное имя пользователя или пароль.");
             }
 
-            // Всё ок, возвращаем пользователя
+            // Всё номана, возвращаем пользователя
             return user;
         }
 
         // Регистрация нового пользователя
         public async Task Register(string username, string password)
         {
-            // Проверяем, нет ли уже такого логина
+            // Валидация логина
+            if (string.IsNullOrWhiteSpace(username))
+                throw new Exception("Логин не может быть пустым.");
+
+            if (username.Length < 3)
+                throw new Exception("Логин должен содержать не менее 3 символов.");
+
+            if (username.Length > 50)
+                throw new Exception("Логин не может быть длиннее 50 символов.");
+
+            // Валидация пароля
+            if (string.IsNullOrWhiteSpace(password))
+                throw new Exception("Пароль не может быть пустым.");
+
+            if (password.Length < 6)
+                throw new Exception("Пароль должен содержать не менее 6 символов.");
+
+            // Проверка уникальности логина
             var existingUser = await _context.Users.AnyAsync(u => u.Login == username);
-
             if (existingUser)
-            {
                 throw new Exception("Пользователь с таким именем уже существует.");
-            }
 
-            // Хэшируем пароль, в открытом виде ничерта не храним, а то шо мы ебланы шоль
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
-            // Создаём пользователя
             var user = new User
             {
                 Login = username,
                 PasswordHash = hashedPassword
             };
 
-            // Добавляем в базу юзера
             _context.Users.Add(user);
-
-            // Сохраняем, чтоб не проебался в моменте
             await _context.SaveChangesAsync();
         }
 

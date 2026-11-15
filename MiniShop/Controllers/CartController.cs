@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniShop.Interface;
-using MiniShop.Models;
 using System.Security.Claims;
 using static MiniShop.DTO;
 
@@ -10,18 +9,14 @@ namespace MiniShop.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-
     public class CartController : ControllerBase
     {
-        private readonly ICartService _CartService;
-        private readonly IJwtProvider _jwtProvider;
+        private readonly ICartService _cartService;
 
-        public CartController(ICartService CartService, IJwtProvider jwtProvider)
+        public CartController(ICartService cartService)
         {
-            _CartService = CartService;
-            _jwtProvider = jwtProvider;
+            _cartService = cartService;
         }
-        //var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
         [HttpPost("create")]
         public async Task<IActionResult> CreateCart([FromBody] CreateCartDto request)
@@ -29,8 +24,8 @@ namespace MiniShop.Controllers
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var Cart = await _CartService.CreateCart(userId, request.Items);
-                return Ok(Cart);
+                var cart = await _cartService.CreateCart(userId, request.Items);
+                return Ok(cart);
             }
             catch (Exception ex)
             {
@@ -38,14 +33,18 @@ namespace MiniShop.Controllers
             }
         }
 
-        [HttpGet("getCarts")]
-        public async Task<IActionResult> GetCartsByUser()
+        [HttpGet("getCart")]
+        public async Task<IActionResult> GetCart()
         {
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var Carts = await _CartService.GetUserCarts(userId);
-                return Ok(Carts);
+                var cart = await _cartService.GetUserCart(userId);
+
+                if (cart == null)
+                    return Ok(new { items = new List<object>() });
+
+                return Ok(cart);
             }
             catch (Exception ex)
             {
@@ -54,14 +53,13 @@ namespace MiniShop.Controllers
         }
 
         [HttpDelete("clear")]
-
-        public async Task<IActionResult> DeleteCartsByUser()
+        public async Task<IActionResult> DeleteCart()
         {
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                await _CartService.DeleteCarts(userId);
-                return Ok(new { message = "Carts deleted successfully" });
+                await _cartService.DeleteCart(userId);
+                return Ok(new { message = "Cart cleared" });
             }
             catch (Exception ex)
             {
