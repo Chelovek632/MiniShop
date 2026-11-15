@@ -1,28 +1,5 @@
 import { ViewCart } from "./product.js";
-
-function showToast(message, type = 'success') {
-    let container = document.getElementById('notification-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'notification-container';
-        document.body.appendChild(container);
-    }
-
-    const toast = document.createElement('div');
-    toast.className = `toast-notification toast-${type}`;
-    toast.innerHTML = `
-        <span>${message}</span>
-        <span style="margin-left: 10px; cursor: pointer; font-weight: bold;">&times;</span>
-    `;
-
-    toast.querySelector('span:last-child').onclick = () => toast.remove();
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.add('fade-out');
-        setTimeout(() => toast.remove(), 300);
-    }, 4000);
-}
+import { showToast, escapeHtml } from "./utils.js";
 
 export function Checkout() {
     const btn = document.getElementById("checkout-btn");
@@ -50,7 +27,6 @@ export function Checkout() {
             const cartResponse = await fetch("http://localhost:5000/api/Cart/getCart", {
                 method: "GET",
                 headers: {
-                    'ngrok-skip-browser-warning': 'true',
                     'Accept': 'application/json',
                     "Authorization": `Bearer ${token}`
                 }
@@ -75,7 +51,6 @@ export function Checkout() {
             const response = await fetch("http://localhost:5000/api/Orders/create", {
                 method: "POST",
                 headers: {
-                    'ngrok-skip-browser-warning': 'true',
                     'Accept': 'application/json',
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
@@ -96,7 +71,6 @@ export function Checkout() {
             await fetch("http://localhost:5000/api/Cart/clear", {
                 method: "DELETE",
                 headers: {
-                    'ngrok-skip-browser-warning': 'true',
                     'Accept': 'application/json',
                     "Authorization": `Bearer ${token}`
                 }
@@ -134,7 +108,6 @@ export function LoadOrders() {
 
     fetch("http://localhost:5000/api/Orders/getorders", {
         headers: {
-            'ngrok-skip-browser-warning': 'true',
             'Accept': 'application/json',
             "Authorization": `Bearer ${token}`
         }
@@ -180,7 +153,7 @@ export function LoadOrders() {
                             ${order.items.map(item => `
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        <strong>${item.product.name}</strong>
+                                        <strong>${escapeHtml(item.product.name)}</strong>
                                         <small class="text-muted d-block">x${item.quantity} • $${item.product.price.toFixed(2)} / шт</small>
                                     </div>
                                     <span class="fw-bold">$${(item.product.price * item.quantity).toFixed(2)}</span>
@@ -188,7 +161,7 @@ export function LoadOrders() {
                             `).join("")}
                         </ul>
                         <div class="d-flex justify-content-between align-items-center border-top pt-2">
-                            <small class="text-muted">Адрес: ${order.address ?? "—"}</small>
+                            <small class="text-muted">Адрес: ${escapeHtml(order.address ?? "—")}</small>
                             <strong class="text-success fs-5">Итого: $${total.toFixed(2)}</strong>
                         </div>
                     </div>
@@ -214,7 +187,7 @@ export function AdminOrderStatus() {
         const token = localStorage.getItem("token");
 
         if (!token) {
-            alert("Нет авторизации");
+            showToast("Нет авторизации", "error");
             return;
         }
 
@@ -224,8 +197,7 @@ export function AdminOrderStatus() {
                 {
                     method: "PUT",
                     headers: {
-                        'ngrok-skip-browser-warning': 'true',
-                'Accept': 'application/json',
+                        'Accept': 'application/json',
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
                     },
@@ -238,11 +210,11 @@ export function AdminOrderStatus() {
                 throw new Error(text);
             }
 
-            alert("Статус заказа обновлён");
+            showToast("Статус заказа обновлён", "success");
             form.reset();
 
         } catch (err) {
-            alert("Ошибка: " + err.message);
+            showToast("Ошибка: " + err.message, "error");
         }
     });
 }
@@ -262,8 +234,7 @@ export function LoadAdminOrders() {
 
     fetch("http://localhost:5000/api/Orders/all", {
         headers: {
-            'ngrok-skip-browser-warning': 'true',
-                'Accept': 'application/json',
+            'Accept': 'application/json',
             "Authorization": `Bearer ${token}`
         }
     })
@@ -287,19 +258,19 @@ export function LoadAdminOrders() {
                 </div>
 
                 <div class="card-body">
-                    <p><b>Пользователь:</b> ${order.userLogin ?? "—"}</p> 
+                    <p><b>Пользователь:</b> ${escapeHtml(order.userLogin ?? "—")}</p> 
                     
                     <ul class="list-group mb-3">
                         ${order.items.map(i => `
                             <li class="list-group-item d-flex justify-content-between">
-                                ${i.productName} x${i.quantity}
+                                ${escapeHtml(i.productName)} x${i.quantity}
                                 <span>$${(i.price * i.quantity).toFixed(2)}</span>
                             </li>
                         `).join("")}
                     </ul>
 
                     <div class="alert alert-light text-center border">
-                        Статус: <b>${order.status}</b>
+                        Статус: <b>${escapeHtml(order.status)}</b>
                     </div>
                 </div>
             `;

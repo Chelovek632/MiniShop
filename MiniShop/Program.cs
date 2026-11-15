@@ -16,7 +16,13 @@ namespace MiniShop
             var builder = WebApplication.CreateBuilder(args);
 
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(
+                        new JsonStringEnumConverter()
+                    );
+                });
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -61,6 +67,10 @@ namespace MiniShop
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
+                    var jwtKey = builder.Configuration["Jwt:Key"];
+                    if (string.IsNullOrWhiteSpace(jwtKey))
+                        throw new InvalidOperationException(
+                            "Jwt:Key не настроен. Задайте его через user-secrets или переменную окружения Jwt__Key.");
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -68,25 +78,17 @@ namespace MiniShop
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
 
-                        ValidIssuer = "MiniShopApi",
-                        ValidAudience = "MiniShopClient",
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "MiniShopApi",
+                        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "MiniShopClient",
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes("super_secret_key_must_be_at_least_32_chars_long"))
+                            Encoding.UTF8.GetBytes(jwtKey))
                     };
-                });
-            builder.Services.AddControllers()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.Converters.Add(
-                        new JsonStringEnumConverter()
-                    );
                 });
             builder.Services.AddCors(options => {
                 options.AddPolicy("AllowFrontend", policy => {
                     policy.WithOrigins(
                             "http://127.0.0.1:5500",
-                            "http://localhost:5500",
-                            "https://untrading-menseless-ivey.ngrok-free.dev"
+                            "http://localhost:5500"
                         )
                         .AllowAnyHeader()
                         .AllowAnyMethod();
@@ -112,12 +114,6 @@ namespace MiniShop
 
 
             app.MapControllers();
-
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            //    db.Database.Migrate();
-            //}
 
             app.Run();
         }

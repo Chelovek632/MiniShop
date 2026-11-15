@@ -29,6 +29,14 @@ namespace MiniShop.Services
 
             if (address.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length < 3)
                 throw new Exception("Введите полный адрес: город, улица и номер дома");
+
+            if (items == null || items.Count == 0)
+                throw new Exception("Корзина пуста — заказ не может быть оформлен");
+
+            // Вся операция (проверка стока + списание + запись заказа) — одна транзакция,
+            // чтобы параллельные заказы не уводили сток в минус
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
             // Создаём новый заказ с начальными значениями
             var order = new Order
             {
@@ -48,6 +56,9 @@ namespace MiniShop.Services
                 // Если товара нет в базе
                 if (product == null)
                     throw new Exception($"Товар с ID {i.ProductId} не найден");
+
+                if (i.Quantity <= 0)
+                    throw new Exception("Количество товара должно быть больше нуля");
 
                 // Если на складе товара меньше чем заказали
                 if (product.Stock < i.Quantity)
@@ -72,6 +83,7 @@ namespace MiniShop.Services
 
             // Сохраняем заказ, айтемы и изменения склада
             await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
 
             return order;
         }

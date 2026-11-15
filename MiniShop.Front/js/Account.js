@@ -1,26 +1,4 @@
-function showToast(message, type = 'success') {
-    let container = document.getElementById('notification-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'notification-container';
-        document.body.appendChild(container);
-    }
-
-    const toast = document.createElement('div');
-    toast.className = `toast-notification toast-${type}`;
-    toast.innerHTML = `
-        <span>${message}</span>
-        <span style="margin-left: 10px; cursor: pointer; font-weight: bold;">&times;</span>
-    `;
-
-    toast.querySelector('span:last-child').onclick = () => toast.remove();
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.add('fade-out');
-        setTimeout(() => toast.remove(), 300);
-    }, 4000);
-}
+import { showToast } from "./utils.js";
 
 export function initLoginPage() {
     const form = document.getElementById("login-form");
@@ -35,7 +13,6 @@ export function initLoginPage() {
             const response = await fetch("http://localhost:5000/api/Account/login", {
                 method: "POST",
                 headers: {
-                    'ngrok-skip-browser-warning': 'true',
                     'Accept': 'application/json',
                     "Content-Type": "application/json"
                 },
@@ -88,7 +65,6 @@ export function initRegisterPage() {
             const response = await fetch("http://localhost:5000/api/Account/register", {
                 method: "POST",
                 headers: {
-                    'ngrok-skip-browser-warning': 'true',
                     'Accept': 'application/json',
                     "Content-Type": "application/json"
                 },
