@@ -21,6 +21,14 @@ namespace MiniShop.Services
         // Создание заказа пользователем
         public async Task<Order> CreateOrder(int userId, List<OrderItemDto> items, string address)
         {
+            if (string.IsNullOrWhiteSpace(address) || address.Trim().Length < 10)
+                throw new Exception("Укажите корректный адрес доставки");
+
+            if (!address.Any(char.IsDigit))
+                throw new Exception("Адрес должен содержать номер дома");
+
+            if (address.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length < 3)
+                throw new Exception("Введите полный адрес: город, улица и номер дома");
             // Создаём новый заказ с начальными значениями
             var order = new Order
             {

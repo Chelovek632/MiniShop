@@ -16,7 +16,7 @@ namespace MiniShop.Controllers
             _userService = userService;
             _jwtProvider = jwtProvider;
         }
-         
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {

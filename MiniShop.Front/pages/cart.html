@@ -14,7 +14,7 @@
             </div>
             <div class="card-footer bg-light text-end">
                 <a href="#product" class="btn btn-outline-light me-2 bg-dunder">Продолжить покупки</a>
-                <button type="submit" class="btn btn-warning" id="update-cart-btn" disabled>Обновить корзину</button>
+                <button type="button" class="btn btn-warning" id="update-cart-btn" disabled>Обновить корзину</button>
             </div>
         </div>
     </form>
@@ -30,21 +30,26 @@
                 Доставка:
                 <span id="cart-shipping" class="text-success fw-bold">Бесплатно</span>
             </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                Срок доставки:
+                <span class="text-muted fw-bold">5–30 рабочих дней</span>
+            </li>
             <li class="list-group-item d-flex justify-content-between align-items-center px-0 border-top mt-2 pt-2">
                 <span class="fs-5">Общая сумма:</span>
                 <span id="cart-total" class="fs-5 text-dunder fw-bold">$0.00</span>
             </li>
         </ul>
 
-        <!-- 🏠 Поле для адреса доставки -->
+
         <div class="mb-3">
             <label for="delivery-address" class="form-label fw-bold text-dunder">Адрес доставки</label>
             <input 
                 type="text" 
                 id="delivery-address" 
                 class="form-control" 
-                placeholder="Введите ваш адрес (улица, дом, квартира)" 
+                placeholder="Город, улица, дом, квартира"
                 required>
+            <div class="form-text text-muted">Минимум 10 символов. Например: Бишкек, ул. Манаса 45, кв. 12</div>
         </div>
 
         <a href="#product" id="checkout-btn" class="btn btn-warning w-100 btn-lg" role="button" disabled>

@@ -1,65 +1,113 @@
+function showToast(message, type = 'success') {
+    let container = document.getElementById('notification-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'notification-container';
+        document.body.appendChild(container);
+    }
 
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.innerHTML = `
+        <span>${message}</span>
+        <span style="margin-left: 10px; cursor: pointer; font-weight: bold;">&times;</span>
+    `;
+
+    toast.querySelector('span:last-child').onclick = () => toast.remove();
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
 
 export function initLoginPage() {
     const form = document.getElementById("login-form");
     if (!form) return;
 
     form.addEventListener("submit", async (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
         const login = document.getElementById("login-email").value;
         const password = document.getElementById("login-password").value;
 
         try {
             const response = await fetch("http://localhost:5000/api/Account/login", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    'ngrok-skip-browser-warning': 'true',
+                    'Accept': 'application/json',
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({ login, password })
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                console.log("Успешный вход:", data);
                 localStorage.setItem("token", data.token);
-                localStorage.setItem("isAdmin", data.role); 
+                localStorage.setItem("isAdmin", data.role);
                 window.location.hash = "home";
             } else {
-                alert(`Ошибка: ${data.error}`);
+                showToast(`Ошибка: ${data.error}`, "error");
             }
         } catch (err) {
             console.error("Ошибка запроса:", err);
-            alert("Не удалось подключиться к серверу");
+            showToast("Не удалось подключиться к серверу", "error");
         }
     });
 }
+
 export function initRegisterPage() {
     const form = document.getElementById("register-form");
     if (!form) return;
+
     form.addEventListener("submit", async (e) => {
-        e.preventDefault(); // чтобы страница не перезагружалась
-        const login = document.getElementById("register-login").value;
+        e.preventDefault();
+        const login = document.getElementById("register-login").value.trim();
         const password = document.getElementById("register-password").value;
+
+        if (!login) {
+            showToast("Логин не может быть пустым.", "error");
+            return;
+        }
+        if (login.length < 3) {
+            showToast("Логин должен содержать не менее 3 символов.", "error");
+            return;
+        }
+        if (!password) {
+            showToast("Пароль не может быть пустым.", "error");
+            return;
+        }
+        if (password.length < 6) {
+            showToast("Пароль должен содержать не менее 6 символов.", "error");
+            return;
+        }
+
         try {
-            const response = await fetch("http://localhost:5000/api/Account/register", {   
+            const response = await fetch("http://localhost:5000/api/Account/register", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    'ngrok-skip-browser-warning': 'true',
+                    'Accept': 'application/json',
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({ login, password })
             });
+
             const data = await response.json();
+
             if (response.ok) {
-                console.log("Успешная регистрация:", data);
-                window.location.hash = "login";
+                showToast("Регистрация успешна! Войдите в систему.", "success");
+                setTimeout(() => { window.location.hash = "login"; }, 1500);
+            } else {
+                showToast(`Ошибка: ${data.error}`, "error");
             }
-            else {
-                alert(`Ошибка: ${data.error}`);
-            }
-        }
-        catch (err) {
+        } catch (err) {
             console.error("Ошибка запроса:", err);
-            alert("Не удалось подключиться к серверу");
+            showToast("Не удалось подключиться к серверу", "error");
         }
-    }
-    )
+    });
 }
 
 export function updateAuthButton() {
@@ -75,7 +123,7 @@ export function updateAuthButton() {
             localStorage.removeItem("token");
             localStorage.removeItem("isAdmin");
             window.location.hash = "login";
-            updateAuthButton(); // обновляем снова
+            updateAuthButton();
         };
     } else {
         authBtn.textContent = "Войти";
@@ -83,12 +131,11 @@ export function updateAuthButton() {
             window.location.hash = "login";
         };
     }
+
     if (userIconBtn) {
         if (token) {
             userIconBtn.classList.remove("d-none");
-            userIconBtn.onclick = () => {
-                window.location.hash = "profile";
-            };
+            userIconBtn.onclick = () => { window.location.hash = "profile"; };
         } else {
             userIconBtn.classList.add("d-none");
         }
@@ -100,11 +147,8 @@ export function OnorOfPanel() {
     if (!adminBtn) return;
     const isAdmin = localStorage.getItem("isAdmin");
     if (isAdmin === "Admin") {
-        console.log(isAdmin);
         adminBtn.classList.remove("d-none");
-        adminBtn.onclick = () => {
-            window.location.hash = "adminpanel";
-        };
+        adminBtn.onclick = () => { window.location.hash = "adminpanel"; };
     } else {
         adminBtn.classList.add("d-none");
     }
@@ -113,7 +157,7 @@ export function OnorOfPanel() {
 export function checkAdmin() {
     const isAdmin = localStorage.getItem("isAdmin");
     if (isAdmin !== "Admin") {
-        alert("У вас нет доступа к этой странице");
+        showToast("У вас нет доступа к этой странице", "error");
         window.location.hash = "home";
     }
     return isAdmin === "Admin";

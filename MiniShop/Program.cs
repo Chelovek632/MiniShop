@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 using MiniShop.Interface;
-using MiniShop.Services;    
+using MiniShop.Services;
 using System.Text;
 
 namespace MiniShop
@@ -84,11 +84,12 @@ namespace MiniShop
             builder.Services.AddCors(options => {
                 options.AddPolicy("AllowFrontend", policy => {
                     policy.WithOrigins(
-                        "http://127.0.0.1:5500",
-                        "http://localhost:5500"
-                    )
-                            .AllowAnyHeader()
-                          .AllowAnyMethod();
+                            "http://127.0.0.1:5500",
+                            "http://localhost:5500",
+                            "https://untrading-menseless-ivey.ngrok-free.dev"
+                        )
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
                 });
             });
 
@@ -105,18 +106,18 @@ namespace MiniShop
             }
 
             //app.UseHttpsRedirection();
-            app.UseCors("AllowFrontend"); 
+            app.UseCors("AllowFrontend");
             app.UseAuthentication();
             app.UseAuthorization();
 
 
             app.MapControllers();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                db.Database.Migrate();
-            }
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            //    db.Database.Migrate();
+            //}
 
             app.Run();
         }

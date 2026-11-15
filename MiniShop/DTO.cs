@@ -15,6 +15,7 @@ namespace MiniShop
             public string Login { get; set; }
             public string Password { get; set; }
         }
+
         public class ProductCreateDto
         {
             public string Name { get; set; }
@@ -22,6 +23,17 @@ namespace MiniShop
             public int Stock { get; set; }
             public string Imageurl { get; set; }
         }
+
+        // Отдельный DTO для обновления — все поля nullable
+        // Если поле не передано (null) — оно не перезаписывается
+        public class ProductUpdateDto
+        {
+            public string? Name { get; set; }
+            public decimal? Price { get; set; }
+            public int? Stock { get; set; }
+            public string? Imageurl { get; set; }
+        }
+
         public class ProductDto
         {
             public int id { get; set; }
@@ -42,15 +54,18 @@ namespace MiniShop
             public int ProductId { get; set; }
             public int Quantity { get; set; }
         }
+
         public class CreateCartDto
         {
             public List<CartItemDto> Items { get; set; }
         }
+
         public class CartItemDto
         {
             public int ProductId { get; set; }
             public int Quantity { get; set; }
         }
+
         public class UpdateOrderStatusDto
         {
             public OrderStatus Status { get; set; }

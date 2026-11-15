@@ -17,9 +17,9 @@ namespace MiniShop
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), 
-                new Claim(ClaimTypes.Name, user.Login), 
-                new Claim(ClaimTypes.Role, user.Role) 
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Login),
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
             var signingCredentials = new SigningCredentials(
@@ -31,7 +31,7 @@ namespace MiniShop
                 issuer: Issuer,
                 audience: Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddHours(3),
                 signingCredentials: signingCredentials
             );
 

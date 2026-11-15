@@ -1,4 +1,30 @@
+function showToast(message, type = 'success') {
+    let container = document.getElementById('notification-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'notification-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.innerHTML = `
+        <span>${message}</span>
+        <span style="margin-left: 10px; cursor: pointer; font-weight: bold;">&times;</span>
+    `;
+
+    toast.querySelector('span:last-child').onclick = () => toast.remove();
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+
 // customer functions
+
 
 export function GetAllProducts() {
     const container = document.getElementById("products-list");
@@ -6,7 +32,12 @@ export function GetAllProducts() {
 
     const token = localStorage.getItem("token"); // проверяем авторизацию
 
-    fetch("http://localhost:5000/api/Product/all")
+        fetch('http://localhost:5000/api/Product/all', {
+            headers: {
+                'ngrok-skip-browser-warning': 'true',
+                'Accept': 'application/json'
+            }
+        })
         .then(response => response.json())
         .then(data => {
             container.innerHTML = "";
@@ -20,11 +51,11 @@ export function GetAllProducts() {
                 const cartButton = token
                     ? `<button data-id="${product.id}" data-name="${encodeURIComponent(product.name)}"
 class="btn btn-warning btn-sm buy-btn">В корзину</button>`
-                    : `<button class="btn btn-secondary btn-sm" disabled>Иди нафиг</button>`;
+                    : `<button class="btn btn-secondary btn-sm" disabled>Вы не вошли в аккаунт</button>`;
 
                 productCard.innerHTML = `
                 <div class="card product-card shadow-sm">
-                    <img src="image/${product.imageurl}" class="product-image card-img-top" alt="${product.name}">
+                    <img src="${product.imageurl}" class="product-image card-img-top" alt="${product.name}">
                     <div class="card-body">
                         <h5 class="card-title">${product.name}</h5>
                         <div class="d-flex justify-content-between align-items-center">
@@ -59,7 +90,7 @@ export function AddToCart() {
 
         const token = localStorage.getItem("token");
         if (!token) {
-            alert("Сначала войдите в систему!");
+            showToast("Сначала войдите в систему!", "warning"); 
             window.location.hash = "login";
             return;
         }
@@ -68,6 +99,8 @@ export function AddToCart() {
             const response = await fetch("http://localhost:5000/api/Cart/create", {
                 method: "POST",
                 headers: {
+                                    'ngrok-skip-browser-warning': 'true',
+                'Accept': 'application/json',
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
@@ -88,11 +121,10 @@ export function AddToCart() {
 
             const result = await response.json();
             console.log("✅ Обновлённая корзина:", result);
-
-            alert(`Товар "${productName}" добавлен в корзину!`);
+            showToast(`Товар "${productName}" добавлен в корзину!`, "warning"); 
         } catch (err) {
             console.error("Ошибка:", err);
-            alert("Не удалось добавить товар в корзину: " + err.message);
+            showToast("Товара не осталось на складе", "warning"); 
         }
     });
 }
@@ -101,7 +133,9 @@ export function AddToCart() {
 
 export async function ViewCart() {
     const container = document.getElementById("cart-items-container");
-    const totalPriceElement = document.getElementById("cart-total");
+    const totalEl = document.getElementById("cart-total");
+    const subtotalEl = document.getElementById("cart-subtotal");
+    const updateBtn = document.getElementById("update-cart-btn");
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -110,51 +144,52 @@ export async function ViewCart() {
     }
 
     try {
-        const res = await fetch("http://localhost:5000/api/Cart/getCarts", {
-            headers: { "Authorization": `Bearer ${token}` }
+        const res = await fetch("http://localhost:5000/api/Cart/getCart", {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                'ngrok-skip-browser-warning': 'true',
+                'Accept': 'application/json'
+            }
         });
 
         if (!res.ok) throw new Error("Ошибка при получении корзины");
 
-        const carts = await res.json(); 
+        const cart = await res.json();
 
-        if (!carts || carts.length === 0) {
+        if (!cart || !cart.items || cart.items.length === 0) {
             container.innerHTML = "<p>Ваша корзина пуста.</p>";
-            totalPriceElement.textContent = "$0.00";
+            totalEl.textContent = "$0.00";
+            subtotalEl.textContent = "$0.00";
             return;
         }
 
         container.innerHTML = "";
         let total = 0;
 
-        carts.forEach(cart => { 
-            let cartTotal = 0;
-            const itemsHtml = (cart.items || []).map(item => {
-                const price = Number(item.product?.price) || 0;
-                const quantity = Number(item.quantity) || 0;
-                const itemTotal = price * quantity;
-                cartTotal += itemTotal;
-                return `
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        ${item.product?.name || "Неизвестно"} (x${quantity}) - $${price} each
-                        <span>$${itemTotal}</span>
-                    </li>
-                `;
-            }).join("");
-            total += cartTotal;
-            const row = document.createElement("div");
-            row.className = "cart-item mb-3 p-2 border rounded";
-            row.innerHTML = `
-                <div class="card-body">
-                    <ul class="list-group mb-3">
-                        ${itemsHtml}
-                    </ul>
-                </div>
-            `;
-            container.appendChild(row);
-        });
-        totalPriceElement.textContent = `$${total.toFixed(2)}`;
+        const itemsHtml = cart.items.map(item => {
+            const price = Number(item.product?.price) || 0;
+            const qty = Number(item.quantity) || 0;
+            total += price * qty;
 
+            return `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${item.product?.name || "Неизвестно"}</strong>
+                        <small class="text-muted d-block">x${qty} • $${price.toFixed(2)} / шт</small>
+                    </div>
+                    <span class="fw-bold">$${(price * qty).toFixed(2)}</span>
+                </li>
+            `;
+        }).join("");
+
+        const row = document.createElement("div");
+        row.className = "cart-item mb-3 p-2 border rounded";
+        row.innerHTML = `<div class="card-body"><ul class="list-group mb-3">${itemsHtml}</ul></div>`;
+        container.appendChild(row);
+
+        totalEl.textContent = `$${total.toFixed(2)}`;
+        subtotalEl.textContent = `$${total.toFixed(2)}`;
+        if (updateBtn) updateBtn.disabled = false;
 
     } catch (err) {
         console.error(err);
@@ -178,11 +213,14 @@ export function AddProduct() {
     if (!form) return;
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const name = document.getElementById("name").value;
-        const price = document.getElementById("price").value;
-        const stock = document.getElementById("quantity").value;
+        const name = document.getElementById("name").value.trim();
+        const price = parseFloat(document.getElementById("price").value);
+        const stock = parseInt(document.getElementById("quantity").value);
         const imageurl = document.getElementById("imageurl").value;
         const token = localStorage.getItem("token");
+        if (!name) { alert("Введите название товара."); return; }
+        if (isNaN(price) || price <= 0) { alert("Цена должна быть больше 0."); return; }
+        if (isNaN(stock) || stock < 0) { alert("Количество не может быть отрицательным."); return; }
         if (!token) {
             alert("Пожалуйста, войдите в систему");
             window.location.hash = "login";
@@ -192,6 +230,8 @@ export function AddProduct() {
             const response = await fetch("http://localhost:5000/api/Product/create", {
                 method: "POST",
                 headers: {
+                                    'ngrok-skip-browser-warning': 'true',
+                'Accept': 'application/json',
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
@@ -225,7 +265,9 @@ export function DeleteProduct() {
             const response = await fetch(`http://localhost:5000/api/Product/delete/${id}`, {
                 method: "DELETE",
                 headers: {
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `Bearer ${token}`,
+                                    'ngrok-skip-browser-warning': 'true',
+                'Accept': 'application/json'
                 },
 
             });
@@ -246,44 +288,73 @@ export function DeleteProduct() {
     });
 }
 
+
 export function EditProduct() {
     const form = document.getElementById("editProductForm");
     if (!form) return;
+
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
+
         const id = document.getElementById("editProductId").value;
-        const name = document.getElementById("editName").value;
-        const price = document.getElementById("editPrice").value;
-        const stock = document.getElementById("editQuantity").value;
-        const imageurl = document.getElementById("editImageUrl").value;
+        const nameRaw = document.getElementById("editName").value.trim();
+        const priceRaw = document.getElementById("editPrice").value;
+        const stockRaw = document.getElementById("editQuantity").value;
+        const imageurlRaw = document.getElementById("editImageUrl").value.trim();
+
+        if (!id) { alert("Введите ID продукта."); return; }
+
+        // Собираем только заполненные поля
+        const body = {};
+        if (nameRaw) body.name = nameRaw;
+        if (priceRaw !== "") {
+            const price = parseFloat(priceRaw);
+            if (isNaN(price) || price <= 0) { alert("Цена должна быть больше 0."); return; }
+            body.price = price;
+        }
+        if (stockRaw !== "") {
+            const stock = parseInt(stockRaw);
+            if (isNaN(stock) || stock < 0) { alert("Количество не может быть отрицательным."); return; }
+            body.stock = stock;
+        }
+        if (imageurlRaw) body.imageurl = imageurlRaw;
+
+        if (Object.keys(body).length === 0) {
+            alert("Заполните хотя бы одно поле для обновления.");
+            return;
+        }
+
         const token = localStorage.getItem("token");
+
         try {
-            const response = await fetch(`http://localhost:5000/api/Product/update/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ name, price, stock, imageurl })
-            });
+            const response = await fetch(
+                `http://localhost:5000/api/Product/update/${id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        'ngrok-skip-browser-warning': 'true',
+                        'Accept': 'application/json',
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                }
+            );
+
             const data = await response.json();
+
             if (response.ok) {
-                console.log("Продукт обновлен:", data);
-                alert("Продукт успешно обновлен");
+                alert("Продукт успешно обновлён");
                 form.reset();
-            }
-            else {
+            } else {
                 alert(`Ошибка: ${data.error}`);
             }
-        }
-        catch (err) {
+        } catch (err) {
             console.error("Ошибка запроса:", err);
             alert("Не удалось подключиться к серверу");
         }
     });
 }
-
-
 
 
 
