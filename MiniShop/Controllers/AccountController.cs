@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using static MiniShop.DTO;
 using MiniShop.Interface;
 
@@ -53,10 +54,12 @@ namespace MiniShop.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            // В API logout обычно просто на клиенте удаляют токен
+            // Токен не отзывается (нет blacklist) — клиент удаляет его сам.
+            // [Authorize] нужен, чтобы logout нельзя было вызвать без валидного токена.
             return Ok(new { message = "Вы вышли" });
         }
     }

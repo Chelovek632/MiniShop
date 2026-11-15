@@ -4,9 +4,11 @@ services:
     environment:
       POSTGRES_DB: MiniShop_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
-    ports:
-      - "5432:5432"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Задайте POSTGRES_PASSWORD в файле .env}
+    # Порт не публикуем наружу — БД доступна только внутри compose-сети.
+    # Для локального доступа (DBeaver и т.п.) временно раскомментируйте:
+    # ports:
+    #   - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -23,7 +25,10 @@ services:
       - "5000:5000"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniShop_db;Username=postgres;Password=1234
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=MiniShop_db;Username=postgres;Password=${POSTGRES_PASSWORD:?Задайте POSTGRES_PASSWORD в файле .env}
+      - Jwt__Key=${JWT_KEY:?Задайте JWT_KEY в файле .env}
+      - Jwt__Issuer=MiniShopApi
+      - Jwt__Audience=MiniShopClient
     depends_on:
       db:
         condition: service_healthy

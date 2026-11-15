@@ -9,9 +9,21 @@ namespace MiniShop
 {
     public class JwtProvider : IJwtProvider
     {
-        private const string SecretKey = "super_secret_key_must_be_at_least_32_chars_long";
-        private const string Issuer = "MiniShopApi";
-        private const string Audience = "MiniShopClient";
+        private readonly string _secretKey;
+        private readonly string _issuer;
+        private readonly string _audience;
+
+        // Секрет берётся из конфигурации (user-secrets локально, env Jwt__Key в Docker)
+        public JwtProvider(IConfiguration configuration)
+        {
+            var key = configuration["Jwt:Key"];
+            if (string.IsNullOrWhiteSpace(key))
+                throw new InvalidOperationException(
+                    "Jwt:Key не настроен. Задайте его через user-secrets или переменную окружения Jwt__Key.");
+            _secretKey = key;
+            _issuer = configuration["Jwt:Issuer"] ?? "MiniShopApi";
+            _audience = configuration["Jwt:Audience"] ?? "MiniShopClient";
+        }
 
         public string GenerateToken(User user)
         {
@@ -23,13 +35,13 @@ namespace MiniShop
             };
 
             var signingCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey)),
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey)),
                 SecurityAlgorithms.HmacSha256
             );
 
             var token = new JwtSecurityToken(
-                issuer: Issuer,
-                audience: Audience,
+                issuer: _issuer,
+                audience: _audience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(3),
                 signingCredentials: signingCredentials

@@ -1,7 +1,17 @@
 import { initLoginPage, initRegisterPage, updateAuthButton, OnorOfPanel, checkAdmin} from "./Account.js";
 import { GetAllProducts, AddProduct, DeleteProduct, EditProduct, AddToCart, ViewCart} from "./product.js";
 import { Checkout, LoadOrders, AdminOrderStatus, LoadAdminOrders, UpdateCart} from "./Order.js";
+import { showToast } from "./utils.js";
 
+// Whitelist страниц — hash из URL не должен попадать в fetch/innerHTML без проверки
+const ALLOWED_PAGES = new Set([
+    "home", "product", "contacts", "cart",
+    "login", "register", "profile", "adminpanel"
+]);
+
+function sanitizePage(page) {
+    return ALLOWED_PAGES.has(page) ? page : "home";
+}
 
 // Глобальный перехватчик fetch — ловит 401 (протухший токен) во всех запросах
 const originalFetch = window.fetch;
@@ -12,7 +22,7 @@ window.fetch = async function(...args) {
         // Токен протух или недействителен — чистим сессию и отправляем на логин
         localStorage.removeItem("token");
         localStorage.removeItem("isAdmin");
-        alert("Сессия истекла. Пожалуйста, войдите снова.");
+        showToast("Сессия истекла. Пожалуйста, войдите снова.", "error");
         window.location.hash = "login";
     }
 
@@ -23,9 +33,14 @@ window.fetch = async function(...args) {
 document.addEventListener("DOMContentLoaded", () => {
     const content = document.getElementById("content");
 
-    async function loadPage(page) {
+    async function loadPage(rawPage) {
+        const page = sanitizePage(rawPage);
         const content = document.getElementById("content");
         const response = await fetch(`pages/${page}.html`);
+        if (!response.ok) {
+            content.innerHTML = "<p>Страница не найдена.</p>";
+            return;
+        }
         content.innerHTML = await response.text();
         OnorOfPanel();
         updateAuthButton();

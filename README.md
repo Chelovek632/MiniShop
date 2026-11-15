@@ -21,28 +21,39 @@
 
 ### Вариант 1 — Docker (простой)
 
-```bash
-docker compose up --build
-```
+1. Скопируйте `.env.example` в `.env` и заполните (`POSTGRES_PASSWORD`, `JWT_KEY`):
+   ```bash
+   cp .env.example .env
+   # JWT_KEY можно сгенерировать:
+   #   python -c "import secrets; print(secrets.token_hex(48))"
+   ```
+2. Поднять всё одной командой:
+   ```bash
+   docker compose up --build
+   ```
 
 - фронт: http://localhost:5500
 - API: http://localhost:5000
-- база: `localhost:5432` (логин `postgres`, пароль `1234`, база `MiniShop_db`)
+- база внутри compose-сети (наружу порт 5432 не публикуется)
 
 ### Вариант 2 — без Docker
 
 1. Нужен PostgreSQL на `localhost:5432` (логин/пароль задаются в `MiniShop/appsettings.json`)
-2. Накатить миграции:
+2. Задать JWT-секрет (один раз, хранится локально в user-secrets, в репозиторий не попадает):
+   ```bash
+   dotnet user-secrets set "Jwt:Key" "<минимум 32 символа>" --project MiniShop
+   ```
+3. Накатить миграции:
    ```bash
    dotnet tool install --global dotnet-ef   # если ещё нет
    dotnet ef database update
    ```
-3. Запустить API:
+4. Запустить API:
    ```bash
    dotnet run --project MiniShop
    ```
    Поднимется на http://localhost:5000
-4. Отдать фронт любым статическим сервером на порту **5500**, например:
+5. Отдать фронт любым статическим сервером на порту **5500**, например:
    ```bash
    npx serve -l 5500 MiniShop.Front
    ```
@@ -74,4 +85,4 @@ Swagger: http://localhost:5000/swagger
 - JWT живёт 3 часа; если протух — фронт сам поймает 401 и кинет на логин
 - Адрес заказа валидируется: нужен город, улица и номер дома
 - Статусы заказа: `Pending → Paid → Shipped → Delivered` (или `Canceled`)
-- Адрес API захардкожен в JS-файлах (`http://localhost:5000`) — при деплое меняется на нужный домен/ngrok
+- Адрес API захардкожен в JS-файлах (`http://localhost:5000`) — при деплое меняется на нужный домен
