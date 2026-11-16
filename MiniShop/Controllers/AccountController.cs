@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static MiniShop.DTO;
 using MiniShop.Interface;
@@ -34,7 +34,7 @@ namespace MiniShop.Controllers
                     Token = token
                 });
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
@@ -48,7 +48,7 @@ namespace MiniShop.Controllers
                 await _userService.Register(request.Login, request.Password);
                 return Ok(new { message = "Регистрация успешна" });
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }

@@ -22,16 +22,16 @@ namespace MiniShop.Services
         public async Task<Order> CreateOrder(int userId, List<OrderItemDto> items, string address)
         {
             if (string.IsNullOrWhiteSpace(address) || address.Trim().Length < 10)
-                throw new Exception("Укажите корректный адрес доставки");
+                throw new AppException("Укажите корректный адрес доставки");
 
             if (!address.Any(char.IsDigit))
-                throw new Exception("Адрес должен содержать номер дома");
+                throw new AppException("Адрес должен содержать номер дома");
 
             if (address.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length < 3)
-                throw new Exception("Введите полный адрес: город, улица и номер дома");
+                throw new AppException("Введите полный адрес: город, улица и номер дома");
 
             if (items == null || items.Count == 0)
-                throw new Exception("Корзина пуста — заказ не может быть оформлен");
+                throw new AppException("Корзина пуста — заказ не может быть оформлен");
 
             // Вся операция (проверка стока + списание + запись заказа) — одна транзакция,
             // чтобы параллельные заказы не уводили сток в минус
@@ -55,14 +55,14 @@ namespace MiniShop.Services
 
                 // Если товара нет в базе
                 if (product == null)
-                    throw new Exception($"Товар с ID {i.ProductId} не найден");
+                    throw new AppException($"Товар с ID {i.ProductId} не найден");
 
                 if (i.Quantity <= 0)
-                    throw new Exception("Количество товара должно быть больше нуля");
+                    throw new AppException("Количество товара должно быть больше нуля");
 
                 // Если на складе товара меньше чем заказали
                 if (product.Stock < i.Quantity)
-                    throw new Exception($"Недостаточно товара: {product.Name}");
+                    throw new AppException($"Недостаточно товара: {product.Name}");
 
                 // Уменьшаем количество товара на складе
                 product.Stock -= i.Quantity;
@@ -118,11 +118,11 @@ namespace MiniShop.Services
             var order = await _context.Orders.FindAsync(orderId);
 
             if (order == null)
-                throw new Exception("Заказ не найден");
+                throw new AppException(404, "Заказ не найден");
 
             // Проверяем, разрешён ли такой переход статуса
             if (!IsValidTransition(order.Status, newStatus))
-                throw new Exception("Недопустимый переход статуса");
+                throw new AppException("Недопустимый переход статуса");
 
             // Обновляем статус
             order.Status = newStatus;

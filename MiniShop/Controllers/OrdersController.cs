@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniShop.Interface;
 using MiniShop.Models;
@@ -30,7 +30,7 @@ namespace MiniShop.Controllers
                 var order = await _orderService.CreateOrder(userId, request.Items,request.Address);
                 return Ok(order);
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
@@ -45,7 +45,7 @@ namespace MiniShop.Controllers
                 var orders = await _orderService.GetUserOrders(userId);
                 return Ok(orders);
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
@@ -61,7 +61,7 @@ namespace MiniShop.Controllers
                     return NotFound(new { error = "Order not found" });
                 return Ok(order);
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }

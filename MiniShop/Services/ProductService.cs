@@ -75,7 +75,7 @@ namespace MiniShop.Services
             bool isReferenced = await _context.OrderItems.AnyAsync(oi => oi.ProductId == id)|| await _context.CartItems.AnyAsync(ci => ci.ProductId == id);
 
             if (isReferenced)
-                throw new Exception("Нельзя удалить товар — он используется в заказах или корзинах");
+                throw new AppException("Нельзя удалить товар — он используется в заказах или корзинах");
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();

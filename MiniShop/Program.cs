@@ -1,9 +1,11 @@
 ﻿
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 using MiniShop.Interface;
+using MiniShop.Middleware;
 using MiniShop.Services;
 using System.Text;
 
@@ -23,6 +25,18 @@ namespace MiniShop
                         new JsonStringEnumConverter()
                     );
                 });
+
+            // Ошибки валидации ModelState → {error: "..."} (тот же формат, что у бизнес-ошибок)
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var error = string.Join("; ", context.ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage) ? "Некорректный запрос" : e.ErrorMessage));
+                    return new BadRequestObjectResult(new { error });
+                };
+            });
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -109,11 +123,13 @@ namespace MiniShop
 
             //app.UseHttpsRedirection();
             app.UseCors("AllowFrontend");
+            app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();
 
 
             app.MapControllers();
+            app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
             app.Run();
         }

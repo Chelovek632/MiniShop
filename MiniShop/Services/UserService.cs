@@ -27,7 +27,7 @@ namespace MiniShop.Services
             // Если пользователя нет или пароль не совпал — сразу вылетаем
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
-                throw new Exception("Неверное имя пользователя или пароль.");
+                throw new AppException("Неверное имя пользователя или пароль.");
             }
 
             // Всё номана, возвращаем пользователя
@@ -39,25 +39,25 @@ namespace MiniShop.Services
         {
             // Валидация логина
             if (string.IsNullOrWhiteSpace(username))
-                throw new Exception("Логин не может быть пустым.");
+                throw new AppException("Логин не может быть пустым.");
 
             if (username.Length < 3)
-                throw new Exception("Логин должен содержать не менее 3 символов.");
+                throw new AppException("Логин должен содержать не менее 3 символов.");
 
             if (username.Length > 50)
-                throw new Exception("Логин не может быть длиннее 50 символов.");
+                throw new AppException("Логин не может быть длиннее 50 символов.");
 
             // Валидация пароля
             if (string.IsNullOrWhiteSpace(password))
-                throw new Exception("Пароль не может быть пустым.");
+                throw new AppException("Пароль не может быть пустым.");
 
             if (password.Length < 6)
-                throw new Exception("Пароль должен содержать не менее 6 символов.");
+                throw new AppException("Пароль должен содержать не менее 6 символов.");
 
             // Проверка уникальности логина
             var existingUser = await _context.Users.AnyAsync(u => u.Login == username);
             if (existingUser)
-                throw new Exception("Пользователь с таким именем уже существует.");
+                throw new AppException("Пользователь с таким именем уже существует.");
 
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 

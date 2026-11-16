@@ -24,10 +24,10 @@ namespace MiniShop.Services
                 var product = await _context.Products.FindAsync(i.ProductId);
 
                 if (product == null)
-                    throw new Exception($"Товар с ID {i.ProductId} не найден");
+                    throw new AppException($"Товар с ID {i.ProductId} не найден");
 
                 if (product.Stock < i.Quantity)
-                    throw new Exception($"Недостаточно товара: {product.Name}");
+                    throw new AppException($"Недостаточно товара: {product.Name}");
             }
 
             var existingCart = await _context.Carts

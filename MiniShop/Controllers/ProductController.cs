@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniShop.Interface;
 using MiniShop.Models;
@@ -104,7 +104,7 @@ namespace MiniShop.Controllers
                     return NotFound(new { error = "Product not found" });
                 return Ok(new { message = "Product deleted successfully" });
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }

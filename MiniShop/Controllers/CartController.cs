@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniShop.Interface;
 using System.Security.Claims;
@@ -27,7 +27,7 @@ namespace MiniShop.Controllers
                 var cart = await _cartService.CreateCart(userId, request.Items);
                 return Ok(cart);
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
@@ -46,7 +46,7 @@ namespace MiniShop.Controllers
 
                 return Ok(cart);
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
@@ -61,7 +61,7 @@ namespace MiniShop.Controllers
                 await _cartService.DeleteCart(userId);
                 return Ok(new { message = "Cart cleared" });
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
