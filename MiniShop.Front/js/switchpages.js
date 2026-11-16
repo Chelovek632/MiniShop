@@ -1,5 +1,5 @@
 import { initLoginPage, initRegisterPage, updateAuthButton, OnorOfPanel, checkAdmin} from "./Account.js";
-import { GetAllProducts, AddProduct, DeleteProduct, EditProduct, AddToCart, ViewCart} from "./product.js";
+import { GetAllProducts, AddProduct, DeleteProduct, EditProduct, AddToCart, ViewCart, InitCatalogToolbar, InitCategoryAdmin, InitImagePreview} from "./product.js";
 import { Checkout, LoadOrders, AdminOrderStatus, LoadAdminOrders, UpdateCart} from "./Order.js";
 import { showToast } from "./utils.js";
 
@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (page === "login") initLoginPage();
         if (page === "register") initRegisterPage();
         if (page === "product") {
+            InitCatalogToolbar();
             GetAllProducts();
             AddToCart();
         }
@@ -59,6 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (page === "cart") Checkout();
         if (page === "cart") UpdateCart();
         if (page === "adminpanel") AddProduct();
+        if (page === "adminpanel") InitCategoryAdmin();
+        if (page === "adminpanel") InitImagePreview();
         if (page === "profile") LoadOrders();
     }
 

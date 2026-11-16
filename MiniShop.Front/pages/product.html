@@ -1,10 +1,30 @@
 <div class="fade-in">
     <h2 class="page-title text-dunder text-center mb-4">🧻 Наши товары</h2>
-    <p class="text-center text-muted mb-5 fst-italic">
+    <p class="text-center text-muted mb-4 fst-italic">
         “Бумага Dunder Mifflin — это не просто бумага. Это обещание качества.” — Pam Beesly
     </p>
+
+    <div class="row g-2 align-items-end mb-4" id="catalog-toolbar">
+        <div class="col-md-5">
+            <label class="form-label small mb-1" for="product-search">Поиск по названию</label>
+            <input type="text" class="form-control" id="product-search" placeholder="Например: кружка">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label small mb-1" for="product-category">Категория</label>
+            <select class="form-select" id="product-category">
+                <option value="">Все категории</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-grid">
+            <button class="btn btn-outline-secondary" id="product-search-btn" type="button">
+                <i class="bi bi-search me-1"></i>Найти
+            </button>
+        </div>
+    </div>
 
     <div class="row" id="products-list">
         <!-- JS отрисует товары -->
     </div>
+
+    <nav id="products-pagination" class="mt-3"></nav>
 </div>

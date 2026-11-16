@@ -69,6 +69,23 @@ namespace MiniShop.Migrations
                     b.ToTable("CartItems");
                 });
 
+            modelBuilder.Entity("MiniShop.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("MiniShop.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -131,6 +148,9 @@ namespace MiniShop.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -146,6 +166,8 @@ namespace MiniShop.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
                 });
@@ -235,9 +257,23 @@ namespace MiniShop.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("MiniShop.Models.Product", b =>
+                {
+                    b.HasOne("MiniShop.Models.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId");
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("MiniShop.Models.Cart", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("MiniShop.Models.Category", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("MiniShop.Models.Order", b =>

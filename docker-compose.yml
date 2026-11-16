@@ -29,6 +29,9 @@ services:
       - Jwt__Key=${JWT_KEY:?Задайте JWT_KEY в файле .env}
       - Jwt__Issuer=MiniShopApi
       - Jwt__Audience=MiniShopClient
+      # Seed админа — опционально: пусто = не создавать
+      - Seed__AdminLogin=${Seed__AdminLogin:-}
+      - Seed__AdminPassword=${Seed__AdminPassword:-}
     depends_on:
       db:
         condition: service_healthy

@@ -39,6 +39,8 @@ namespace MiniShop
 
             [StringLength(500, ErrorMessage = "URL изображения — не более 500 символов")]
             public string? Imageurl { get; set; }
+
+            public int? CategoryId { get; set; }
         }
 
         // Отдельный DTO для обновления — все поля nullable
@@ -56,6 +58,8 @@ namespace MiniShop
 
             [StringLength(500, ErrorMessage = "URL изображения — не более 500 символов")]
             public string? Imageurl { get; set; }
+
+            public int? CategoryId { get; set; }
         }
 
         public class ProductDto
@@ -65,6 +69,30 @@ namespace MiniShop
             public decimal Price { get; set; }
             public int Stock { get; set; }
             public string Imageurl { get; set; } = string.Empty;
+            public int? CategoryId { get; set; }
+            public string? CategoryName { get; set; }
+        }
+
+        // Ответ каталога с пагинацией
+        public class PagedProductsDto
+        {
+            public List<ProductDto> items { get; set; } = new();
+            public int total { get; set; }
+            public int page { get; set; }
+            public int pageSize { get; set; }
+        }
+
+        public class CategoryDto
+        {
+            public int id { get; set; }
+            public string Name { get; set; } = string.Empty;
+        }
+
+        public class CategoryCreateDto
+        {
+            [Required(ErrorMessage = "Введите название категории")]
+            [StringLength(100, ErrorMessage = "Название — не более 100 символов")]
+            public string Name { get; set; } = string.Empty;
         }
 
         public class CreateOrderDto

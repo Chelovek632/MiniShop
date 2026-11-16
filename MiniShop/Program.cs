@@ -45,6 +45,7 @@ namespace MiniShop
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 
             builder.Services.AddEndpointsApiExplorer();
@@ -123,6 +124,10 @@ namespace MiniShop
 
             //app.UseHttpsRedirection();
             app.UseCors("AllowFrontend");
+
+            // Статика: картинки товаров из wwwroot/uploads
+            app.UseStaticFiles();
+
             app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -130,6 +135,31 @@ namespace MiniShop
 
             app.MapControllers();
             app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
+
+            // Seed админа из конфигурации (Seed:AdminLogin / Seed:AdminPassword)
+            using (var scope = app.Services.CreateScope())
+            {
+                var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                var adminLogin = config["Seed:AdminLogin"];
+                var adminPassword = config["Seed:AdminPassword"];
+
+                if (!string.IsNullOrWhiteSpace(adminLogin) && !string.IsNullOrWhiteSpace(adminPassword))
+                {
+                    var exists = db.Users.Any(u => u.Login == adminLogin);
+                    if (!exists)
+                    {
+                        db.Users.Add(new Models.User
+                        {
+                            Login = adminLogin,
+                            PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
+                            Role = "Admin"
+                        });
+                        db.SaveChanges();
+                        Console.WriteLine($"[Seed] Создан администратор '{adminLogin}'");
+                    }
+                }
+            }
 
             app.Run();
         }

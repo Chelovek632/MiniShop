@@ -15,10 +15,36 @@
         </div>
         <div class="mb-3">
             <label class="form-label" for="imageurl">URL изображения:</label>
-            <input type="text" class="form-control" id="imageurl" name="product-imageurl" placeholder="Введите URL изображения" required>
+            <input type="text" class="form-control" id="imageurl" name="product-imageurl" placeholder="Введите URL изображения">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="imagefile">Или загрузите файл:</label>
+            <input type="file" class="form-control" id="imagefile" name="product-imagefile" accept=".jpg,.jpeg,.png,.webp,.gif">
+            <img id="image-preview" src="" alt="" class="img-thumbnail mt-2 d-none" style="max-height: 120px;">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="productCategory">Категория:</label>
+            <select class="form-select" id="productCategory" name="product-category">
+                <option value="">Без категории</option>
+            </select>
         </div>
         <button type="submit" class="btn btn-success w-100">Добавить</button>
     </form>
+</div>
+
+<div class="fade-in col-md-6 offset-md-3 mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h5 class="fw-bold text-dunder mb-3">Категории</h5>
+            <form id="createCategoryForm" class="mb-3">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="categoryName" placeholder="Название новой категории" maxlength="100" required>
+                    <button class="btn btn-primary" type="submit">Создать</button>
+                </div>
+            </form>
+            <ul id="category-list" class="list-group"></ul>
+        </div>
+    </div>
 </div>
 
 <div class="fade-in container-fluid px-4 mt-4">
