@@ -365,3 +365,7 @@ FodyWeavers.xsd
 .env
 server.log
 server.err.log
+
+# Загруженные картинки товаров
+MiniShop/wwwroot/uploads/*
+!MiniShop/wwwroot/uploads/.gitkeep
