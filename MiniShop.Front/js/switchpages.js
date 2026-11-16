@@ -1,4 +1,4 @@
-import { initLoginPage, initRegisterPage, updateAuthButton, OnorOfPanel, checkAdmin} from "./Account.js";
+import { initLoginPage, initRegisterPage, updateAuthButton, OnorOfPanel, checkAdmin, InitChangePassword} from "./Account.js";
 import { GetAllProducts, AddProduct, DeleteProduct, EditProduct, AddToCart, ViewCart, InitCatalogToolbar, InitCategoryAdmin, InitImagePreview} from "./product.js";
 import { Checkout, LoadOrders, AdminOrderStatus, LoadAdminOrders, UpdateCart} from "./Order.js";
 import { showToast } from "./utils.js";
@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (page === "adminpanel") InitCategoryAdmin();
         if (page === "adminpanel") InitImagePreview();
         if (page === "profile") LoadOrders();
+        if (page === "profile") InitChangePassword();
     }
 
     document.querySelectorAll("a.nav-link").forEach(link => {

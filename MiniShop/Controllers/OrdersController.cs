@@ -76,6 +76,24 @@ namespace MiniShop.Controllers
             return Ok();
         }
 
+        // Демо-оплата: владелец переводит свой заказ Pending -> Paid.
+        // В реальном магазине здесь был бы webhook от платёжного провайдера.
+        [HttpPost("{id}/pay")]
+        public async Task<IActionResult> Pay(int id)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var order = await _orderService.GetById(id, userId);
+            if (order == null)
+                return NotFound(new { error = "Заказ не найден" });
+
+            if (order.Status != Models.Enums.OrderStatus.Pending)
+                return BadRequest(new { error = "Оплатить можно только заказ в статусе «В обработке»" });
+
+            await _orderService.UpdateStatus(id, Models.Enums.OrderStatus.Paid);
+            return Ok(new { message = "Оплата прошла успешно (демо)" });
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpGet("all")]
         public async Task<IActionResult> GetAllOrdersForAdmin()

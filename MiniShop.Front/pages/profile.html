@@ -23,4 +23,25 @@
             <span class="fst-italic">“Купи бумагу. Спаси офис.” — Jim Halpert</span>
         </div>
     </div>
+
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-body">
+            <h5 class="fw-bold text-dunder mb-3">🔑 Смена пароля</h5>
+            <form id="changePasswordForm">
+                <div class="mb-2">
+                    <label class="form-label small" for="oldPassword">Текущий пароль</label>
+                    <input type="password" class="form-control form-control-sm" id="oldPassword" autocomplete="current-password" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small" for="newPassword">Новый пароль (мин. 6 символов)</label>
+                    <input type="password" class="form-control form-control-sm" id="newPassword" autocomplete="new-password" minlength="6" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small" for="confirmPassword">Повторите новый пароль</label>
+                    <input type="password" class="form-control form-control-sm" id="confirmPassword" autocomplete="new-password" minlength="6" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Сменить пароль</button>
+            </form>
+        </div>
+    </div>
 </div>

@@ -77,5 +77,25 @@ namespace MiniShop.Services
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
+
+        // Смена пароля: подтверждение старым паролем + валидация нового
+        public async Task ChangePassword(int userId, string oldPassword, string newPassword)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                throw new AppException(404, "Пользователь не найден");
+
+            if (!BCrypt.Net.BCrypt.Verify(oldPassword ?? string.Empty, user.PasswordHash))
+                throw new AppException("Неверный текущий пароль");
+
+            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+                throw new AppException("Новый пароль должен содержать не менее 6 символов");
+
+            if (oldPassword == newPassword)
+                throw new AppException("Новый пароль не должен совпадать со старым");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            await _context.SaveChangesAsync();
+        }
     }
 }

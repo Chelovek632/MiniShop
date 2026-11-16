@@ -138,3 +138,53 @@ export function checkAdmin() {
     }
     return isAdmin === "Admin";
 }
+
+// Смена пароля в профиле
+export function InitChangePassword() {
+    const form = document.getElementById("changePasswordForm");
+    if (!form) return;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const oldPassword = document.getElementById("oldPassword").value;
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            showToast("Сначала войдите в систему", "error");
+            window.location.hash = "login";
+            return;
+        }
+        if (newPassword.length < 6) {
+            showToast("Новый пароль — минимум 6 символов", "error");
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            showToast("Пароли не совпадают", "error");
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:5000/api/Account/changePassword", {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ oldPassword, newPassword })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                showToast("Пароль успешно изменён", "success");
+                form.reset();
+            } else {
+                showToast(`Ошибка: ${data.error}`, "error");
+            }
+        } catch (err) {
+            console.error("Ошибка запроса:", err);
+            showToast("Не удалось подключиться к серверу", "error");
+        }
+    });
+}

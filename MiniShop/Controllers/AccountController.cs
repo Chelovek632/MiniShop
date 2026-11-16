@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Claims;
 using static MiniShop.DTO;
 using MiniShop.Interface;
 
@@ -18,6 +20,7 @@ namespace MiniShop.Controllers
             _jwtProvider = jwtProvider;
         }
 
+        [EnableRateLimiting("auth")]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
@@ -40,6 +43,7 @@ namespace MiniShop.Controllers
             }
         }
 
+        [EnableRateLimiting("auth")]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
@@ -61,6 +65,15 @@ namespace MiniShop.Controllers
             // Токен не отзывается (нет blacklist) — клиент удаляет его сам.
             // [Authorize] нужен, чтобы logout нельзя было вызвать без валидного токена.
             return Ok(new { message = "Вы вышли" });
+        }
+
+        [Authorize]
+        [HttpPost("changePassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto request)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _userService.ChangePassword(userId, request.OldPassword, request.NewPassword);
+            return Ok(new { message = "Пароль изменён" });
         }
     }
 }

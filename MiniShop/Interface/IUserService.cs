@@ -7,5 +7,6 @@ namespace MiniShop.Interface
         Task Register(string username, string password);
         Task<User> Login(string username, string password);
         Task<User> FindById(int id);
+        Task ChangePassword(int userId, string oldPassword, string newPassword);
     }
 }

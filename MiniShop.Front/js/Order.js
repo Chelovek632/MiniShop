@@ -164,10 +164,48 @@ export function LoadOrders() {
                             <small class="text-muted">Адрес: ${escapeHtml(order.address ?? "—")}</small>
                             <strong class="text-success fs-5">Итого: $${total.toFixed(2)}</strong>
                         </div>
+                        ${order.status === "Pending" ? `
+                        <div class="text-end mt-2">
+                            <button class="btn btn-success btn-sm pay-btn" data-id="${order.id}">
+                                <i class="bi bi-credit-card me-1"></i>Оплатить (демо)
+                            </button>
+                        </div>` : ""}
                     </div>
                 </div>
             `;
             accordion.appendChild(item);
+        });
+
+        // Оплата заказа (демо-заглушка: Pending -> Paid)
+        accordion.addEventListener("click", async (e) => {
+            const btn = e.target.closest(".pay-btn");
+            if (!btn) return;
+
+            const orderId = btn.getAttribute("data-id");
+            const token = localStorage.getItem("token");
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/Orders/${orderId}/pay`, {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showToast(`Заказ #${orderId} оплачен`, "success");
+                    LoadOrders();
+                } else {
+                    showToast(`Ошибка: ${data.error}`, "error");
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error("Ошибка оплаты:", err);
+                showToast("Не удалось подключиться к серверу", "error");
+                btn.disabled = false;
+            }
         });
     })
     .catch(() => {

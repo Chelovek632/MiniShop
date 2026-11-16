@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
@@ -8,6 +9,7 @@ using MiniShop.Interface;
 using MiniShop.Middleware;
 using MiniShop.Services;
 using System.Text;
+using System.Threading.RateLimiting;
 
 namespace MiniShop
 {
@@ -112,6 +114,26 @@ namespace MiniShop
 
             builder.Services.AddAuthorization();
 
+            // Rate limiting на auth-эндпоинты: 10 запросов / 10 секунд с одного IP
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                options.AddPolicy("auth", httpContext =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 10,
+                            Window = TimeSpan.FromSeconds(10)
+                        }));
+                options.OnRejected = async (context, token) =>
+                {
+                    context.HttpContext.Response.ContentType = "application/json; charset=utf-8";
+                    await context.HttpContext.Response.WriteAsync(
+                        "{\"error\":\"Слишком много попыток. Подождите немного.\"}", token);
+                };
+            });
+
 
             var app = builder.Build();
 
@@ -124,6 +146,7 @@ namespace MiniShop
 
             //app.UseHttpsRedirection();
             app.UseCors("AllowFrontend");
+            app.UseRateLimiter();
 
             // Статика: картинки товаров из wwwroot/uploads
             app.UseStaticFiles();
