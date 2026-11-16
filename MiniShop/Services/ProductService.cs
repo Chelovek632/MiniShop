@@ -22,29 +22,36 @@ namespace MiniShop.Services
             if (pageSize < 1) pageSize = 12;
             if (pageSize > 100) pageSize = 100;
 
-            var query = _context.Products.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                var term = search.Trim().ToLower();
-                query = query.Where(p => p.Name.ToLower().Contains(term));
-            }
+            var query = _context.Products
+                .Include(p => p.Category)
+                .AsQueryable();
 
             if (categoryId.HasValue)
                 query = query.Where(p => p.CategoryId == categoryId.Value);
 
-            var total = await query.CountAsync();
+            // Каталог небольшой: после SQL-фильтра по категории ищем в памяти —
+            // регистронезависимо для кириллицы (SQL lower() зависит от провайдера:
+            // в SQLite он складывает только ASCII)
+            var all = await query.ToListAsync();
 
-            var products = await query
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim();
+                all = all
+                    .Where(p => p.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            var total = all.Count;
+            var items = all
                 .OrderBy(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Include(p => p.Category)
-                .ToListAsync();
+                .ToList();
 
             return new PagedProductsDto
             {
-                items = products.Select(ToDto).ToList(),
+                items = items.Select(ToDto).ToList(),
                 total = total,
                 page = page,
                 pageSize = pageSize

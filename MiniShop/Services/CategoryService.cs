@@ -28,8 +28,9 @@ namespace MiniShop.Services
             if (string.IsNullOrWhiteSpace(name))
                 throw new AppException("Введите название категории");
 
-            var exists = await _context.Categories.AnyAsync(c => c.Name.ToLower() == name.ToLower());
-            if (exists)
+            // Сравниваем в памяти: SQL lower() не переживает кириллицу в SQLite
+            var existingNames = await _context.Categories.Select(c => c.Name).ToListAsync();
+            if (existingNames.Any(n => string.Equals(n, name, StringComparison.OrdinalIgnoreCase)))
                 throw new AppException("Категория с таким названием уже существует");
 
             var category = new Category { Name = name };
